@@ -54,15 +54,27 @@ const DraftoutWidget = (() => {
   }
 
   const DEFAULT_RANKS = [
-    { name: 'Novice', min: 0, max: 999, color: '#888888' },
-    { name: 'Guardian', min: 1000, max: 1199, color: '#4ade80' },
-    { name: 'Warden', min: 1200, max: 1399, color: '#38bdf8' },
-    { name: 'Evoker I', min: 1400, max: 1499, color: '#a78bfa' },
-    { name: 'Evoker II', min: 1500, max: 1549, color: '#c084fc' },
-    { name: 'Evoker III', min: 1550, max: 1599, color: '#D7D284' },
-    { name: 'Phantom I', min: 1600, max: 1699, color: '#818cf8' },
-    { name: 'Phantom II', min: 1700, max: 1799, color: '#6366f1' },
-    { name: 'Titan', min: 1800, max: null, color: '#f59e0b' },
+    { name: 'Silverfish I', min: 0, max: 99, color: '#ACB1B4' },
+    { name: 'Silverfish II', min: 100, max: 199, color: '#ACB1B4' },
+    { name: 'Silverfish III', min: 200, max: 299, color: '#ACB1B4' },
+    { name: 'Silverfish IV', min: 300, max: 399, color: '#ACB1B4' },
+    { name: 'Silverfish V', min: 400, max: 499, color: '#ACB1B4' },
+    { name: 'Slime I', min: 500, max: 599, color: '#77B07D' },
+    { name: 'Slime II', min: 600, max: 699, color: '#77B07D' },
+    { name: 'Slime III', min: 700, max: 799, color: '#77B07D' },
+    { name: 'Slime IV', min: 800, max: 899, color: '#77B07D' },
+    { name: 'Slime V', min: 900, max: 999, color: '#77B07D' },
+    { name: 'Vex I', min: 1000, max: 1099, color: '#A7C6D7' },
+    { name: 'Vex II', min: 1100, max: 1199, color: '#A7C6D7' },
+    { name: 'Vex III', min: 1200, max: 1299, color: '#A7C6D7' },
+    { name: 'Evoker I', min: 1300, max: 1399, color: '#D7D284' },
+    { name: 'Evoker II', min: 1400, max: 1499, color: '#D7D284' },
+    { name: 'Evoker III', min: 1500, max: 1599, color: '#D7D284' },
+    { name: 'Phantom I', min: 1600, max: 1699, color: '#5970C0' },
+    { name: 'Phantom II', min: 1700, max: 1799, color: '#5970C0' },
+    { name: 'Guardian I', min: 1800, max: 1899, color: '#36775F' },
+    { name: 'Guardian II', min: 1900, max: 1999, color: '#36775F' },
+    { name: 'Warden', min: 2000, max: null, color: '#1CCEDA' },
   ];
 
   function findRankBands(elo, ranks) {
@@ -181,26 +193,40 @@ const DraftoutWidget = (() => {
 
   // ════════════════════════════════════════════════════════════
   // SLIDE 2 — Ranking & Progress Bar
-  // User request: "sobre todo la barra del slide 2, en vez de poner la barra y los puntos creo que solo con la barra estaria bien"
   // ════════════════════════════════════════════════════════════
   function slideRanking(stats, cfg, ranks) {
     const { player } = stats;
     const elo = player?.elo;
+    const isUnranked = (elo == null || !player?.ranked || player?.rankName?.toLowerCase() === 'unranked');
     const { current, next, pct } = findRankBands(elo, ranks);
     const t = T(cfg.lang);
     const isVert = (cfg.layout || 'vertical') !== 'horizontal';
+
+    // Target rank label
+    let targetHtml = '';
+    if (isUnranked) {
+      const firstTarget = (ranks && ranks[0]) || DEFAULT_RANKS[0]; // Silverfish I
+      targetHtml = `<div class="ow-next-rank" style="color:${firstTarget?.color || '#ACB1B4'}">▲ ${firstTarget?.name || 'Silverfish I'}</div>`;
+    } else if (next) {
+      targetHtml = `<div class="ow-next-rank" style="color:${next.color || 'var(--rc)'}">▲ ${next.name}</div>`;
+    } else {
+      // Truly top rank (Titan/Apex with elo >= 1800)
+      targetHtml = `<div class="ow-bval ow-gold" style="font-size:13px">🏆 MAX</div>`;
+    }
+
+    const fillPct  = isUnranked ? 0 : (pct || 0);
+    const barColor = isUnranked ? 'rgba(255,255,255,0.15)' : (current?.color || 'var(--rc)');
 
     if (isVert) {
       return `
         <div class="ow-ranking-vert">
           <div class="ow-ranking-vert-header">
             <div class="ow-bval ow-purple">#${player?.rank ?? '--'} <span class="ow-meta-label">${t.RANK}</span></div>
-            ${next ? `<div class="ow-next-rank" style="color:${next.color || 'var(--rc)'}">▲ ${next.name}</div>` : `<div class="ow-bval ow-gold" style="font-size:13px">🏆 MAX</div>`}
+            ${targetHtml}
           </div>
-          ${next ? `
           <div class="ow-rank-bar-track">
-            <div class="ow-rank-bar-fill" style="width:${pct}%;background:${current?.color || 'var(--rc)'}"></div>
-          </div>` : ''}
+            <div class="ow-rank-bar-fill" style="width:${fillPct}%;background:${barColor}"></div>
+          </div>
         </div>`;
     }
 
@@ -212,9 +238,9 @@ const DraftoutWidget = (() => {
       <div class="ow-sep-line"></div>
       <div class="ow-rank-bar-wrap">
         <div class="ow-rank-bar-track">
-          <div class="ow-rank-bar-fill" style="width:${pct}%;background:${current?.color || 'var(--rc)'}"></div>
+          <div class="ow-rank-bar-fill" style="width:${fillPct}%;background:${barColor}"></div>
         </div>
-        ${next ? `<div class="ow-meta-label" style="color:${next.color || 'inherit'}">▲ ${next.name}</div>` : `<div class="ow-meta-label">🏆 MAX</div>`}
+        ${targetHtml}
       </div>`;
   }
 
@@ -275,11 +301,16 @@ const DraftoutWidget = (() => {
               <span class="ow-rival-name">↑ ${above.username}</span>
               <span class="ow-bval ow-blue" style="font-size:12px">A ${eloDiff} ELO</span>
             </div>
-          </div>` : `
+          </div>` : (myRank === 1 ? `
           <div class="ow-stat-item" style="text-align:right">
             <span class="ow-bval ow-gold">🏆 #1</span>
             <span class="ow-meta-label">${t.TOP_LB}</span>
-          </div>`}`;
+          </div>` : `
+          <div class="ow-stat-item" style="text-align:right">
+            <span class="ow-bval">${record?.completedMatches ?? 0}</span>
+            <span class="ow-meta-label">${t.MATCHES}</span>
+          </div>`)}
+        </div>`;
     }
 
     return `
@@ -300,11 +331,15 @@ const DraftoutWidget = (() => {
           <div class="ow-bval ow-blue" style="font-size:14px">A ${eloDiff} ELO</div>
           <div class="ow-meta-label" style="white-space:nowrap">↑ ${above.username}</div>
         </div>
-      </div>` : `
+      </div>` : (myRank === 1 ? `
       <div class="ow-block">
         <div class="ow-bval ow-gold" style="font-size:14px">🏆 TOP</div>
         <div class="ow-meta-label">${t.TOP_LB}</div>
-      </div>`}`;
+      </div>` : `
+      <div class="ow-block">
+        <div class="ow-bval ow-purple" style="font-size:14px">#${myRank ?? '--'}</div>
+        <div class="ow-meta-label">${t.RANK}</div>
+      </div>`)}`;
   }
 
   // ── Slide registry ───────────────────────────────────────────
