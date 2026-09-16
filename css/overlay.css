@@ -1,0 +1,831 @@
+/* ============================================================
+   Draftout Overlay Widget — overlay.css
+   Used by both overlay.html (OBS) and index.html (preview)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* ── Widget container ──────────────────────────────────────── */
+.ow-widget {
+  --rc: #888888;   /* rank color     (set inline via JS)  */
+  --ac: #6366f1;   /* accent color   (set inline via JS)  */
+  --sc: 1;         /* scale          (set inline via JS)  */
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 18px 15px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+
+  /* Glassmorphism with accent tint */
+  background: rgba(8, 8, 20, 0.88);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid color-mix(in srgb, var(--ac, #6366f1) 38%, rgba(255, 255, 255, 0.09));
+
+  /* Depth shadow + dynamic accent aura */
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.6),
+    0 0 22px color-mix(in srgb, var(--ac, #6366f1) 22%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  transform: scale(var(--sc));
+  transform-origin: bottom left;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  animation: owSlideIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Subtle accent ambient aura */
+.ow-widget::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--ac, #6366f1) 16%, transparent) 0%, transparent 62%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ── Color Themes ───────────────────────────────────────────── */
+
+/* 1. Dark (Default sleek obsidian & glass) */
+.ow-widget[data-theme="dark"] {
+  background: rgba(8, 8, 20, 0.88);
+}
+
+/* 2. Darker (OLED Pure Black) */
+.ow-widget[data-theme="darker"] {
+  background: rgba(0, 0, 0, 0.98);
+  border-color: color-mix(in srgb, var(--ac, #6366f1) 35%, rgba(255, 255, 255, 0.12));
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.92),
+    0 0 24px color-mix(in srgb, var(--ac, #6366f1) 25%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* 3. Midnight (Deep Indigo & Navy) */
+.ow-widget[data-theme="midnight"] {
+  background: linear-gradient(135deg, rgba(8, 12, 36, 0.95), rgba(3, 6, 22, 0.97));
+  border-color: color-mix(in srgb, var(--ac, #6366f1) 45%, rgba(99, 102, 241, 0.3));
+  box-shadow:
+    0 16px 44px rgba(2, 6, 23, 0.8),
+    0 0 25px color-mix(in srgb, var(--ac, #6366f1) 30%, transparent),
+    inset 0 1px 0 rgba(129, 140, 248, 0.15);
+}
+
+/* 4. Cyberpunk (Electric Cyan & Neon Magenta) */
+.ow-widget[data-theme="cyberpunk"] {
+  background: linear-gradient(135deg, rgba(14, 10, 32, 0.95), rgba(4, 20, 34, 0.96));
+  border-color: color-mix(in srgb, var(--ac, #06b6d4) 55%, #ec4899);
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.85),
+    0 0 28px rgba(6, 182, 212, 0.28),
+    0 0 12px rgba(236, 72, 153, 0.22),
+    inset 0 0 16px rgba(6, 182, 212, 0.14);
+}
+
+/* 5. Emerald (Deep Jade & Forest Dark) */
+.ow-widget[data-theme="emerald"] {
+  background: linear-gradient(135deg, rgba(3, 26, 16, 0.95), rgba(1, 14, 8, 0.97));
+  border-color: color-mix(in srgb, var(--ac, #22c55e) 50%, rgba(34, 197, 94, 0.35));
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.8),
+    0 0 24px rgba(34, 197, 94, 0.24),
+    inset 0 1px 0 rgba(74, 222, 128, 0.16);
+}
+
+/* 6. Crimson (Blood Dragon & Dark Ruby) */
+.ow-widget[data-theme="crimson"] {
+  background: linear-gradient(135deg, rgba(32, 5, 14, 0.95), rgba(16, 2, 7, 0.97));
+  border-color: color-mix(in srgb, var(--ac, #f43f5e) 50%, rgba(244, 63, 94, 0.35));
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.8),
+    0 0 24px rgba(244, 63, 94, 0.26),
+    inset 0 1px 0 rgba(251, 113, 133, 0.16);
+}
+
+/* 7. Amethyst (Royal Twilight & Deep Purple) */
+.ow-widget[data-theme="amethyst"] {
+  background: linear-gradient(135deg, rgba(24, 7, 38, 0.95), rgba(12, 3, 20, 0.97));
+  border-color: color-mix(in srgb, var(--ac, #a855f7) 50%, rgba(168, 85, 247, 0.35));
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.8),
+    0 0 24px rgba(168, 85, 247, 0.26),
+    inset 0 1px 0 rgba(192, 132, 252, 0.16);
+}
+
+/* 8. Light (Crisp, High-Contrast Frosted Snow) */
+.ow-widget[data-theme="light"] {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  color: #0f172a;
+  border: 1px solid color-mix(in srgb, var(--ac, #6366f1) 32%, rgba(15, 23, 42, 0.14));
+  box-shadow:
+    0 16px 36px rgba(15, 23, 42, 0.14),
+    0 3px 10px rgba(15, 23, 42, 0.08),
+    0 0 20px color-mix(in srgb, var(--ac, #6366f1) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.ow-widget[data-theme="light"]::before {
+  background: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--ac, #6366f1) 14%, transparent) 0%, transparent 60%);
+}
+
+.ow-widget[data-theme="light"] .ow-username {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.ow-widget[data-theme="light"] .ow-rank-name {
+  color: #854d0e; /* High-contrast readable dark amber */
+  font-weight: 700;
+  opacity: 1;
+}
+
+.ow-widget[data-theme="light"] .ow-rank-icon {
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
+}
+.ow-widget[data-theme="light"] .ow-rank-icon text {
+  fill: #0f172a;
+  font-weight: 800;
+}
+
+.ow-widget[data-theme="light"] .ow-meta-label {
+  color: #475569;
+  opacity: 1;
+  font-weight: 700;
+}
+
+.ow-widget[data-theme="light"] .ow-sep-line {
+  background: rgba(15, 23, 42, 0.14);
+}
+
+.ow-widget[data-theme="light"] .ow-elo-val {
+  color: #0f172a;
+  text-shadow: none;
+}
+
+.ow-widget[data-theme="light"] .ow-bval {
+  color: #0f172a;
+}
+
+.ow-widget[data-theme="light"] .ow-green,
+.ow-widget[data-theme="light"] .ow-wins {
+  color: #16a34a;
+}
+
+.ow-widget[data-theme="light"] .ow-losses {
+  color: #dc2626;
+}
+
+.ow-widget[data-theme="light"] .ow-wl-slash {
+  color: #94a3b8;
+}
+
+.ow-widget[data-theme="light"] .ow-gold {
+  color: #b45309;
+  text-shadow: none;
+}
+
+.ow-widget[data-theme="light"] .ow-blue {
+  color: #2563eb;
+}
+
+.ow-widget[data-theme="light"] .ow-purple {
+  color: #7c3aed;
+}
+
+.ow-widget[data-theme="light"] .ow-ind {
+  background: rgba(15, 23, 42, 0.2);
+}
+.ow-widget[data-theme="light"] .ow-ind-active {
+  background: var(--ac, #4f46e5);
+  box-shadow: 0 0 6px var(--ac, #4f46e5);
+}
+
+.ow-widget[data-theme="light"] .ow-rank-bar-track {
+  background: rgba(15, 23, 42, 0.12);
+}
+.ow-widget[data-theme="light"] .ow-rank-bar-fill {
+  box-shadow: none;
+}
+
+.ow-widget[data-theme="light"] .ow-refresh-dot {
+  background: rgba(15, 23, 42, 0.25);
+}
+
+/* ── Top colored bar (dual rank & accent glow) ──────────────── */
+.ow-top-bar {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--rc) 0%, var(--ac, var(--rc)) 100%);
+  box-shadow: 0 0 12px var(--ac, var(--rc)), 0 0 4px var(--rc);
+  border-radius: 14px 14px 0 0;
+}
+
+/* ── Rank icon ───────────────────────────────────────────────── */
+.ow-rank-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 48px;
+  filter: drop-shadow(0 0 7px var(--rc)) drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  transition: filter 0.3s;
+}
+.ow-rank-icon svg { width: 100%; height: 100%; }
+
+/* ── Player Avatar (Minecraft Head with Rank Border & Glow) ──── */
+.ow-player-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid color-mix(in srgb, var(--rc, #6366f1) 85%, #ffffff);
+  box-shadow: 
+    0 0 12px color-mix(in srgb, var(--rc, #6366f1) 45%, transparent),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ow-widget[data-layout="vertical"] .ow-player-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+}
+
+.ow-avatar-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.ow-widget[data-theme="light"] .ow-player-avatar {
+  border-color: color-mix(in srgb, var(--rc, #6366f1) 90%, #0f172a);
+  box-shadow: 
+    0 0 10px color-mix(in srgb, var(--rc, #6366f1) 35%, transparent),
+    0 2px 6px rgba(15, 23, 42, 0.15);
+}
+
+/* ── Player name & rank ─────────────────────────────────────── */
+.ow-player {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ow-username {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  line-height: 1;
+}
+.ow-rank-name {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.88;
+  line-height: 1;
+}
+
+/* ── Separator line ─────────────────────────────────────────── */
+.ow-sep-line {
+  width: 1px;
+  height: 34px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 1px;
+}
+
+/* ── ELO block ──────────────────────────────────────────────── */
+.ow-elo-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.ow-elo-val {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--rc);
+  text-shadow: 0 0 10px var(--rc);
+  letter-spacing: -0.5px;
+  animation: owEloIn 0.4s ease;
+}
+.ow-meta-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: 0.45;
+  line-height: 1;
+}
+
+/* ── W/L block ──────────────────────────────────────────────── */
+.ow-wl-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.ow-wl-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+.ow-wins    { color: #4ade80; }
+.ow-losses  { color: #f87171; }
+.ow-wl-slash { color: rgba(255,255,255,0.25); font-weight: 400; }
+
+/* ── Streak block ───────────────────────────────────────────── */
+.ow-streak-block {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ow-streak-icon { font-size: 17px; line-height: 1; }
+.ow-streak-val  {
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+/* ── Peak ELO block ─────────────────────────────────────────── */
+.ow-peak-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.ow-peak-val {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fbbf24;
+}
+
+/* ── Global rank block ──────────────────────────────────────── */
+.ow-grank-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.ow-grank-val {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: #c084fc;
+}
+
+/* ── Match dots ─────────────────────────────────────────────── */
+.ow-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.ow-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+.ow-dot:hover  { transform: scale(1.3); }
+.ow-dot-win    { background: #4ade80; box-shadow: 0 0 5px #4ade80; }
+.ow-dot-loss   { background: #f87171; box-shadow: 0 0 5px #f87171; }
+.ow-dot-draw   { background: #facc15; box-shadow: 0 0 5px #facc15; }
+.ow-dot-unknown{ background: rgba(255,255,255,0.2); }
+
+/* ── Refresh indicator dot ──────────────────────────────────── */
+.ow-refresh-dot {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: background 0.3s;
+}
+.ow-refresh-dot.pulsing {
+  background: var(--rc);
+  animation: owPulse 0.6s ease;
+}
+
+/* ── Overlay page positioning (overlay.html) ────────────────── */
+.ow-page {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  padding: 24px;
+  display: flex;
+  pointer-events: none;
+}
+.ow-page[data-pos="top-left"]      { align-items: flex-start; justify-content: flex-start; }
+.ow-page[data-pos="top-right"]     { align-items: flex-start; justify-content: flex-end;   }
+.ow-page[data-pos="middle-left"]   { align-items: center;     justify-content: flex-start; }
+.ow-page[data-pos="middle-right"]  { align-items: center;     justify-content: flex-end;   }
+.ow-page[data-pos="bottom-left"]   { align-items: flex-end;   justify-content: flex-start; }
+.ow-page[data-pos="bottom-right"]  { align-items: flex-end;   justify-content: flex-end;   }
+
+.ow-page[data-pos="top-left"]     .ow-widget { transform-origin: top left;    }
+.ow-page[data-pos="top-right"]    .ow-widget { transform-origin: top right;   }
+.ow-page[data-pos="middle-left"]  .ow-widget { transform-origin: center left; }
+.ow-page[data-pos="middle-right"] .ow-widget { transform-origin: center right;}
+.ow-page[data-pos="bottom-left"]  .ow-widget { transform-origin: bottom left; }
+.ow-page[data-pos="bottom-right"] .ow-widget { transform-origin: bottom right;}
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes owSlideIn {
+  from { opacity: 0; transform: translateY(8px) scale(var(--sc)); }
+  to   { opacity: 1; transform: translateY(0)   scale(var(--sc)); }
+}
+@keyframes owEloIn {
+  from { transform: translateY(-4px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes owPulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.8); opacity: 0.6; }
+  100% { transform: scale(1);   opacity: 0.15; }
+}
+@keyframes owFadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   ROTATING PANEL SYSTEM
+   ════════════════════════════════════════════════════════════ */
+
+/* Wraps the rotating right section */
+.ow-rotating-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+/* The content area that swaps */
+.ow-slide-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 42px;
+}
+
+/* Slide exit animation */
+.ow-slide-exit {
+  animation: owSlideOut 0.18s ease forwards;
+}
+@keyframes owSlideOut {
+  to { opacity: 0; transform: translateY(-5px); }
+}
+
+/* Slide enter animation */
+.ow-slide-enter {
+  animation: owSlideEnter 0.3s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes owSlideEnter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Slide indicators ────────────────────────────────────────── */
+.ow-indicators {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.ow-ind {
+  height: 3px;
+  width: 5px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.18);
+  transition: width 0.35s cubic-bezier(0.22,1,0.36,1), background 0.35s;
+}
+.ow-ind-active {
+  width: 14px;
+  background: var(--ac, var(--rc));
+  box-shadow: 0 0 6px var(--ac, var(--rc));
+}
+
+/* ── Generic block (used in all slides) ──────────────────────── */
+.ow-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.ow-bval {
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+.ow-blue   { color: #60a5fa; }
+.ow-purple { color: #c084fc; }
+.ow-gold   { color: #fbbf24; text-shadow: 0 0 8px rgba(251,191,36,0.5); }
+.ow-green  { color: #4ade80; }
+
+/* ── Rank progress bar (Ranking slide) ───────────────────────── */
+.ow-rank-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 80px;
+}
+.ow-rank-bar-track {
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.ow-rank-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* ── Recent matches slide ─────────────────────────────────────── */
+.ow-recent-list {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ow-recent-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.ow-dot-lg {
+  width: 12px !important;
+  height: 12px !important;
+  box-shadow: none !important;
+}
+.ow-recent-chg {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+.ow-recent-win  .ow-recent-chg { color: #4ade80; }
+.ow-recent-loss .ow-recent-chg { color: #f87171; }
+
+/* ── Minecraft player heads ──────────────────────────────────── */
+.ow-mc-head {
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  image-rendering: pixelated;
+  display: block;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  transition: transform 0.15s;
+}
+
+.ow-mc-head-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  image-rendering: pixelated;
+  display: block;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+/* Fallback when image fails to load */
+.ow-mc-head-fallback {
+  background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(168,85,247,0.25));
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── Rival / next on leaderboard block (Slide 4) ─────────────── */
+.ow-rival-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ow-rival-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+/* ════════════════════════════════════════════════════════════
+   VERTICAL (STACKED 2-ROW) LAYOUT
+   ============================================================ */
+.ow-widget[data-layout="vertical"] {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 320px;
+  padding: 12px 14px 10px;
+  white-space: normal;
+}
+
+.ow-row-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.ow-widget[data-layout="vertical"] .ow-rank-icon {
+  width: 34px;
+  height: 38px;
+  flex-shrink: 0;
+}
+
+.ow-player-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ow-player-details .ow-username {
+  font-size: 14.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.1;
+}
+
+.ow-player-details .ow-rank-name {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.ow-elo-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.ow-elo-number {
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--rc);
+  text-shadow: 0 0 10px var(--rc);
+  letter-spacing: -0.5px;
+}
+
+.ow-elo-badge-lbl {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.ow-h-sep {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.ow-row-slide {
+  width: 100%;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.ow-widget[data-layout="vertical"] .ow-slide-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+}
+
+.ow-slide-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.ow-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Slide 2: Ranking & Progress Bar in Vertical */
+.ow-ranking-vert {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.ow-ranking-vert-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ow-next-rank {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.ow-ranking-vert .ow-rank-bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.ow-ranking-vert .ow-rank-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* Slide 3: Recent Matches in Vertical */
+.ow-widget[data-layout="vertical"] .ow-recent-list {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 4px;
+}
+
+.ow-widget[data-layout="vertical"] .ow-recent-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ow-widget[data-layout="vertical"] .ow-mc-head {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+/* Slide 4: Rival in Vertical */
+.ow-rival-name {
+  font-size: 10.5px;
+  font-weight: 700;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+
+/* Light mode overrides for vertical layout */
+.ow-widget[data-theme="light"][data-layout="vertical"] .ow-h-sep {
+  background: rgba(15, 23, 42, 0.1);
+}
+
+.ow-widget[data-theme="light"][data-layout="vertical"] .ow-elo-number {
+  color: #0f172a;
+  text-shadow: none;
+}
+
+.ow-widget[data-theme="light"][data-layout="vertical"] .ow-elo-badge-lbl {
+  color: #64748b;
+  opacity: 1;
+}
+
+.ow-widget[data-theme="light"][data-layout="vertical"] .ow-ranking-vert .ow-rank-bar-track {
+  background: rgba(15, 23, 42, 0.12);
+}

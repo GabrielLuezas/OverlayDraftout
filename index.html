@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google" content="notranslate" />
+  <title id="meta-title">Draftout Studio — Overlay Esports Suite para OBS</title>
+  <meta id="meta-desc" name="description" content="Diseña y personaliza tu overlay competitivo de Draftout para OBS y Streamlabs en segundos. Estadísticas en tiempo real, rotación inteligente y estética esports premium." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/overlay.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Studio Header ────────────────────────────────────────── -->
+  <header class="studio-header">
+    <div class="brand-group">
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name-wrap">
+          <span class="brand-title">DRAFTOUT</span>
+          <span class="brand-badge">STUDIO</span>
+        </div>
+        <span class="brand-sub" data-i18n="headerSubtitle">Esports Broadcast HUD & Overlay Suite</span>
+      </div>
+    </div>
+
+    <!-- Presets bar in header -->
+    <div class="header-presets">
+      <span class="presets-label" data-i18n="lblPresets">⚡ Presets rápidos:</span>
+      <div class="presets-pills">
+        <button class="preset-pill active" data-preset="streamer" data-i18n="presetStreamer">🎮 Streamer Pro</button>
+        <button class="preset-pill" data-preset="competitive" data-i18n="presetCompetitive">⚔️ Competitivo</button>
+        <button class="preset-pill" data-preset="minimal" data-i18n="presetMinimal">💎 Minimalista</button>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Language Switcher Capsule -->
+      <div class="lang-capsule">
+        <button class="lang-btn active" data-lang-btn="es">🇪🇸 ES</button>
+        <button class="lang-btn" data-lang-btn="en">🇬🇧 EN</button>
+      </div>
+      <a href="https://draftoutmc.com" target="_blank" rel="noopener" class="header-link-btn" title="Draftout Official">
+        <span>Draftout MC</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Studio Layout ─────────────────────────────────────────── -->
+  <div class="studio-layout">
+
+    <!-- LEFT: Studio Control Deck -->
+    <aside class="studio-deck">
+
+      <!-- Navigation Tabs -->
+      <nav class="deck-tabs" role="tablist">
+        <button class="deck-tab active" data-tab="player" role="tab" aria-selected="true">
+          <span class="deck-tab-icon">👤</span>
+          <span class="deck-tab-label" data-i18n="tabPlayer">Jugador</span>
+        </button>
+        <button class="deck-tab" data-tab="design" role="tab" aria-selected="false">
+          <span class="deck-tab-icon">🎨</span>
+          <span class="deck-tab-label" data-i18n="tabDesign">Diseño</span>
+        </button>
+        <button class="deck-tab" data-tab="modules" role="tab" aria-selected="false">
+          <span class="deck-tab-icon">⚡</span>
+          <span class="deck-tab-label" data-i18n="tabModules">Módulos</span>
+        </button>
+        <button class="deck-tab" data-tab="obs" role="tab" aria-selected="false">
+          <span class="deck-tab-icon">📺</span>
+          <span class="deck-tab-label" data-i18n="tabObs">OBS Setup</span>
+        </button>
+      </nav>
+
+      <!-- TAB 1: PLAYER / PERFIL -->
+      <div class="tab-panel active" id="tab-panel-player" role="tabpanel">
+        
+        <!-- Profile Banner Card -->
+        <div class="profile-hero-card">
+          <div class="profile-avatar-wrap">
+            <img id="deck-avatar-img" class="profile-avatar-img" src="https://mc-heads.net/avatar/Steve/52" alt="Avatar" />
+            <div class="profile-avatar-glow" id="deck-avatar-glow"></div>
+          </div>
+          <div class="profile-hero-info">
+            <div class="profile-username" id="deck-username">YourUsername</div>
+            <div class="profile-rank-pill" id="deck-rank-pill">
+              <span class="profile-rank-dot" id="deck-rank-dot"></span>
+              <span class="profile-rank-name" id="deck-rank-name">Evoker III</span>
+            </div>
+          </div>
+          <div class="profile-hero-elo">
+            <span class="profile-elo-val" id="deck-elo-val">1,566</span>
+            <span class="profile-elo-lbl">ELO</span>
+          </div>
+        </div>
+
+        <!-- Username Input Group -->
+        <div class="deck-group">
+          <label class="deck-group-title" for="input-username" data-i18n="lblUsername">Nombre de usuario de Minecraft</label>
+          <div class="input-modern-row">
+            <div class="input-icon-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <input
+              id="input-username"
+              class="input-modern"
+              type="text"
+              placeholder="ej. bing_pigs"
+              data-i18n-ph="phUsername"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button id="btn-load" class="btn-glow-primary" data-i18n="btnLoad">
+              <span>Cargar</span>
+            </button>
+          </div>
+          <div class="quick-demo-users">
+            <span class="quick-demo-lbl" data-i18n="lblDemoUsers">Ejemplos rápidos:</span>
+            <button class="demo-chip" data-user="bing_pigs">bing_pigs</button>
+            <button class="demo-chip" data-user="RetroPog">RetroPog</button>
+            <button class="demo-chip" data-user="SpeedRunner42">SpeedRunner42</button>
+          </div>
+        </div>
+
+        <!-- Live Stats Summary Grid -->
+        <div class="deck-group">
+          <div class="deck-group-header">
+            <span class="deck-group-title" data-i18n="lblStatsSummary">Estadísticas competitivas</span>
+            <span class="deck-group-sub" id="deck-data-source">Datos demostración</span>
+          </div>
+          <div class="stats-mini-grid">
+            <div class="stat-mini-card">
+              <span class="stat-mini-lbl" data-i18n="lblWr">Win Rate</span>
+              <span class="stat-mini-val color-green" id="stat-wr">88%</span>
+            </div>
+            <div class="stat-mini-card">
+              <span class="stat-mini-lbl" data-i18n="lblWl">V / D</span>
+              <span class="stat-mini-val" id="stat-wl">14W <span class="stat-loss">2L</span></span>
+            </div>
+            <div class="stat-mini-card">
+              <span class="stat-mini-lbl" data-i18n="lblPeakElo">Peak ELO</span>
+              <span class="stat-mini-val color-gold" id="stat-peak">1,590</span>
+            </div>
+            <div class="stat-mini-card">
+              <span class="stat-mini-lbl" data-i18n="lblStreak">Racha</span>
+              <span class="stat-mini-val color-fire" id="stat-streak">🔥 12</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: DESIGN / DISEÑO -->
+      <div class="tab-panel" id="tab-panel-design" role="tabpanel">
+
+        <!-- Layout Selector Cards -->
+        <div class="deck-group">
+          <label class="deck-group-title" data-i18n="lblLayout">📐 Formato del Overlay</label>
+          <div class="layout-cards">
+            <button class="layout-card active" data-layout-btn="vertical">
+              <div class="layout-card-wireframe layout-wf-vert">
+                <div class="wf-row wf-row-hdr">
+                  <div class="wf-box wf-avatar"></div>
+                  <div class="wf-col"><div class="wf-line"></div><div class="wf-line wf-line-sub"></div></div>
+                  <div class="wf-pill"></div>
+                </div>
+                <div class="wf-divider"></div>
+                <div class="wf-row wf-row-slide"><div class="wf-bar"></div></div>
+              </div>
+              <div class="layout-card-info">
+                <span class="layout-card-title" data-i18n="layoutVert">Tarjeta (Vertical)</span>
+                <span class="layout-card-desc" data-i18n="layoutVertDesc">Compacta · 2 filas · Ideal esports</span>
+              </div>
+            </button>
+
+            <button class="layout-card" data-layout-btn="horizontal">
+              <div class="layout-card-wireframe layout-wf-hori">
+                <div class="wf-box wf-avatar"></div>
+                <div class="wf-col"><div class="wf-line"></div><div class="wf-line wf-line-sub"></div></div>
+                <div class="wf-sep"></div>
+                <div class="wf-col"><div class="wf-line"></div><div class="wf-line wf-line-sub"></div></div>
+              </div>
+              <div class="layout-card-info">
+                <span class="layout-card-title" data-i18n="layoutHori">Barra (Horizontal)</span>
+                <span class="layout-card-desc" data-i18n="layoutHoriDesc">Tira ancha · 1 fila · Estilo clásico</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Color Themes Grid -->
+        <div class="deck-group">
+          <div class="deck-group-header">
+            <label class="deck-group-title" data-i18n="lblTheme">Tema de Color</label>
+            <span class="deck-group-sub" data-i18n="lblThemeSub">Glassmorphism pulido</span>
+          </div>
+          <div class="theme-deck-grid">
+            <button class="theme-card active" data-theme-btn="dark">
+              <span class="theme-card-dot" style="background:#080814;border-color:#6366f1;"></span>
+              <span class="theme-card-name" data-i18n="themeDark">Oscuro</span>
+            </button>
+            <button class="theme-card" data-theme-btn="darker">
+              <span class="theme-card-dot" style="background:#000000;border-color:#ffffff;"></span>
+              <span class="theme-card-name" data-i18n="themeDarker">OLED</span>
+            </button>
+            <button class="theme-card" data-theme-btn="midnight">
+              <span class="theme-card-dot" style="background:#060a22;border-color:#818cf8;"></span>
+              <span class="theme-card-name" data-i18n="themeMidnight">Midnight</span>
+            </button>
+            <button class="theme-card" data-theme-btn="cyberpunk">
+              <span class="theme-card-dot" style="background:#0a0620;border-color:#06b6d4;box-shadow:0 0 6px #ec4899;"></span>
+              <span class="theme-card-name" data-i18n="themeCyberpunk">Cyberpunk</span>
+            </button>
+            <button class="theme-card" data-theme-btn="emerald">
+              <span class="theme-card-dot" style="background:#02180e;border-color:#22c55e;"></span>
+              <span class="theme-card-name" data-i18n="themeEmerald">Esmeralda</span>
+            </button>
+            <button class="theme-card" data-theme-btn="crimson">
+              <span class="theme-card-dot" style="background:#1e030c;border-color:#f43f5e;"></span>
+              <span class="theme-card-name" data-i18n="themeCrimson">Carmesí</span>
+            </button>
+            <button class="theme-card" data-theme-btn="amethyst">
+              <span class="theme-card-dot" style="background:#150524;border-color:#a855f7;"></span>
+              <span class="theme-card-name" data-i18n="themeAmethyst">Amatista</span>
+            </button>
+            <button class="theme-card" data-theme-btn="light">
+              <span class="theme-card-dot" style="background:#ffffff;border-color:#cbd5e1;"></span>
+              <span class="theme-card-name" data-i18n="themeLight">Claro</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scale Slider -->
+        <div class="deck-group">
+          <div class="deck-group-header">
+            <label class="deck-group-title" data-i18n="lblScale">Tamaño / Escala</label>
+            <span id="scale-val" class="deck-val-badge">1.0x</span>
+          </div>
+          <div class="range-modern-wrap">
+            <span class="range-edge">0.7x</span>
+            <input id="scale-slider" class="range-modern" type="range" min="0.7" max="2" step="0.05" value="1" />
+            <span class="range-edge">2.0x</span>
+          </div>
+        </div>
+
+        <!-- Accent Color Picker -->
+        <div class="deck-group">
+          <label class="deck-group-title" data-i18n="lblAccent">Color de Acento / Aura</label>
+          <div class="color-deck-row">
+            <div class="color-picker-capsule">
+              <input id="accent-color" class="color-input-native" type="color" value="#6366f1" />
+              <span class="color-hex-text" id="accent-hex">#6366F1</span>
+            </div>
+            <div id="accent-swatches" class="color-swatches-grid"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 3: MODULES / MÓDULOS -->
+      <div class="tab-panel" id="tab-panel-modules" role="tabpanel">
+
+        <!-- Elements Toggles -->
+        <div class="deck-group">
+          <label class="deck-group-title" data-i18n="secDisplay">Elementos del HUD</label>
+          <div class="modern-toggle-grid">
+
+            <label class="mod-toggle-card" for="toggle-rank-icon">
+              <div class="mod-toggle-left">
+                <span class="mod-icon">👤</span>
+                <div class="mod-texts">
+                  <span class="mod-title" data-i18n="optRankIcon">Avatar del jugador</span>
+                  <span class="mod-sub" data-i18n="optAvatarSub">Cabeza Minecraft de tu skin</span>
+                </div>
+              </div>
+              <div class="switch-ios">
+                <input type="checkbox" id="toggle-rank-icon" checked />
+                <span class="switch-track"></span>
+              </div>
+            </label>
+
+            <label class="mod-toggle-card" for="toggle-elo">
+              <div class="mod-toggle-left">
+                <span class="mod-icon">⚡</span>
+                <div class="mod-texts">
+                  <span class="mod-title" data-i18n="optElo">Puntos ELO</span>
+                  <span class="mod-sub" data-i18n="optEloSub">Puntuación actual en directo</span>
+                </div>
+              </div>
+              <div class="switch-ios">
+                <input type="checkbox" id="toggle-elo" checked />
+                <span class="switch-track"></span>
+              </div>
+            </label>
+
+            <label class="mod-toggle-card" for="toggle-wl">
+              <div class="mod-toggle-left">
+                <span class="mod-icon">📊</span>
+                <div class="mod-texts">
+                  <span class="mod-title" data-i18n="optWl">Victorias / Derrotas</span>
+                  <span class="mod-sub" data-i18n="optWlSub">Contador W / L de la era</span>
+                </div>
+              </div>
+              <div class="switch-ios">
+                <input type="checkbox" id="toggle-wl" checked />
+                <span class="switch-track"></span>
+              </div>
+            </label>
+
+            <label class="mod-toggle-card" for="toggle-winrate">
+              <div class="mod-toggle-left">
+                <span class="mod-icon">📈</span>
+                <div class="mod-texts">
+                  <span class="mod-title" data-i18n="optWinrate">Win Rate (%)</span>
+                  <span class="mod-sub" data-i18n="optWinrateSub">Porcentaje de victoria</span>
+                </div>
+              </div>
+              <div class="switch-ios">
+                <input type="checkbox" id="toggle-winrate" checked />
+                <span class="switch-track"></span>
+              </div>
+            </label>
+
+            <label class="mod-toggle-card" for="toggle-streak">
+              <div class="mod-toggle-left">
+                <span class="mod-icon">🔥</span>
+                <div class="mod-texts">
+                  <span class="mod-title" data-i18n="optStreak">Racha actual</span>
+                  <span class="mod-sub" data-i18n="optStreakSub">Victorias consecutivas</span>
+                </div>
+              </div>
+              <div class="switch-ios">
+                <input type="checkbox" id="toggle-streak" checked />
+                <span class="switch-track"></span>
+              </div>
+            </label>
+
+            <label class="mod-toggle-card" for="toggle-matches">
+              <div class="mod-toggle-left">
+                <span class="mod-icon">⚔️</span>
+                <div class="mod-texts">
+                  <span class="mod-title" data-i18n="optMatches">Partidas recientes</span>
+                  <span class="mod-sub" data-i18n="optMatchesSub">Cabezas de rivales (+/- ELO)</span>
+                </div>
+              </div>
+              <div class="switch-ios">
+                <input type="checkbox" id="toggle-matches" checked />
+                <span class="switch-track"></span>
+              </div>
+            </label>
+
+            <label class="mod-toggle-card" for="toggle-peak">
+              <div class="mod-toggle-left">
+                <span class="mod-icon">🏆</span>
+                <div class="mod-texts">
+                  <span class="mod-title" data-i18n="optPeak">Peak ELO (Récord)</span>
+                  <span class="mod-sub" data-i18n="optPeakSub">Máxima puntuación alcanzada</span>
+                </div>
+              </div>
+              <div class="switch-ios">
+                <input type="checkbox" id="toggle-peak" checked />
+                <span class="switch-track"></span>
+              </div>
+            </label>
+
+            <label class="mod-toggle-card" for="toggle-global-rank">
+              <div class="mod-toggle-left">
+                <span class="mod-icon">🌍</span>
+                <div class="mod-texts">
+                  <span class="mod-title" data-i18n="optGlobalRank">Puesto en ranking (#)</span>
+                  <span class="mod-sub" data-i18n="optGlobalRankSub">Posición de leaderboard</span>
+                </div>
+              </div>
+              <div class="switch-ios">
+                <input type="checkbox" id="toggle-global-rank" checked />
+                <span class="switch-track"></span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- Slides Rotation Config -->
+        <div class="deck-group">
+          <div class="deck-group-header">
+            <label class="deck-group-title" data-i18n="secRotation">Rotación de Paneles Dinámicos</label>
+          </div>
+
+          <div class="sub-field">
+            <span class="sub-field-lbl" data-i18n="lblRotSpeed">Velocidad de transición</span>
+            <div class="pill-group">
+              <button class="pill-btn" data-rotation-btn="3">3s</button>
+              <button class="pill-btn active" data-rotation-btn="5">5s</button>
+              <button class="pill-btn" data-rotation-btn="8">8s</button>
+              <button class="pill-btn" data-rotation-btn="12">12s</button>
+            </div>
+          </div>
+
+          <div class="slide-checkbox-list">
+            <label class="slide-check-item">
+              <input type="checkbox" id="toggle-ranking-slide" checked />
+              <span class="custom-chk"></span>
+              <span class="slide-check-text" data-i18n="optRankingSlide">Slide 2: Ranking y barra de progreso</span>
+            </label>
+            <label class="slide-check-item">
+              <input type="checkbox" id="toggle-records-slide" checked />
+              <span class="custom-chk"></span>
+              <span class="slide-check-text" data-i18n="optRecordsSlide">Slide 3: Récords y siguiente rival</span>
+            </label>
+            <label class="slide-check-item">
+              <input type="checkbox" id="toggle-recent-slide" checked />
+              <span class="custom-chk"></span>
+              <span class="slide-check-text" data-i18n="optRecentSlide">Slide 4: Últimas partidas con cabezas</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Refresh Rate -->
+        <div class="deck-group">
+          <div class="deck-group-header">
+            <label class="deck-group-title" data-i18n="secTiming">Actualización de Datos</label>
+          </div>
+          <div class="sub-field">
+            <span class="sub-field-lbl" data-i18n="lblRefresh">Consultar API cada…</span>
+            <div class="pill-group">
+              <button class="pill-btn" data-refresh-btn="30">30s</button>
+              <button class="pill-btn active" data-refresh-btn="60" data-i18n="ref60s">1 min</button>
+              <button class="pill-btn" data-refresh-btn="120" data-i18n="ref120s">2 min</button>
+              <button class="pill-btn" data-refresh-btn="300" data-i18n="ref300s">5 min</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 4: OBS SETUP / INTEGRACIÓN -->
+      <div class="tab-panel" id="tab-panel-obs" role="tabpanel">
+
+        <!-- Position Picker Grid -->
+        <div class="deck-group">
+          <label class="deck-group-title" data-i18n="secPosition">Posición en la Pantalla</label>
+          <div class="pos-matrix">
+            <button class="pos-matrix-btn" data-pos="top-left" data-i18n="posTopLeft">↖ Arriba Izq</button>
+            <button class="pos-matrix-btn" data-pos="top-right" data-i18n="posTopRight">Arriba Der ↗</button>
+            <button class="pos-matrix-btn" data-pos="middle-left" data-i18n="posMidLeft">← Medio Izq</button>
+            <button class="pos-matrix-btn" data-pos="middle-right" data-i18n="posMidRight">Medio Der →</button>
+            <button class="pos-matrix-btn active" data-pos="bottom-left" data-i18n="posBottomLeft">↙ Abajo Izq</button>
+            <button class="pos-matrix-btn" data-pos="bottom-right" data-i18n="posBottomRight">Abajo Der ↘</button>
+          </div>
+        </div>
+
+        <!-- URL Output Dock -->
+        <div class="deck-group">
+          <div class="deck-group-header">
+            <label class="deck-group-title" data-i18n="urlLabel">URL para Fuente de Navegador (OBS)</label>
+            <span class="deck-badge-green" data-i18n="urlBadge">Listo para transmitir</span>
+          </div>
+          <div class="url-action-card">
+            <input
+              id="url-output"
+              class="url-mono-field"
+              type="text"
+              readonly
+              placeholder="Configura tu usuario primero…"
+              data-i18n-ph="urlPh"
+            />
+            <div class="url-btn-row">
+              <button id="btn-copy" class="btn-glow-primary btn-copy-action" data-i18n="btnCopy">
+                <span>📋 Copiar URL</span>
+              </button>
+              <button id="btn-open-preview" class="btn-ghost-action" data-i18n="btnOpenTab" title="Abrir en pestaña">
+                <span>↗ Abrir</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- OBS Visual Step Cards -->
+        <div class="deck-group">
+          <label class="deck-group-title" data-i18n="obsTitle">📺 Pasos de Configuración en OBS</label>
+          <div class="obs-card-steps">
+            <div class="obs-step-card">
+              <div class="step-badge">Paso 1</div>
+              <p class="step-text" data-i18n="stepObs1">En OBS, crea una fuente: <strong>Navegador</strong> (Browser Source).</p>
+            </div>
+            <div class="obs-step-card">
+              <div class="step-badge">Paso 2</div>
+              <p class="step-text" data-i18n="stepObs2">Pega la <strong>URL copiada</strong> en el campo URL.</p>
+            </div>
+            <div class="obs-step-card">
+              <div class="step-badge">Paso 3</div>
+              <p class="step-text" data-i18n="stepObs3">Ajusta resolución a <code>1920 × 1080</code> (ancho x alto).</p>
+            </div>
+            <div class="obs-step-card">
+              <div class="step-badge">Paso 4</div>
+              <p class="step-text" data-i18n="stepObs4">Activa <strong>"Permitir transparencia"</strong> y guarda. ¡A streamear!</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- RIGHT: Stream Simulator Studio -->
+    <main class="stream-studio">
+
+      <!-- Simulator Control Bar -->
+      <div class="simulator-topbar">
+        <div class="sim-status-pill">
+          <span class="sim-live-pulse"></span>
+          <span class="sim-live-text" data-i18n="simLiveText">SIMULADOR EN DIRECTO</span>
+          <span class="sim-res-tag">1080p · 60 FPS</span>
+        </div>
+
+        <!-- Scene Background Switcher -->
+        <div class="scene-switcher">
+          <span class="scene-switcher-label" data-i18n="lblSceneBg">Escena de fondo:</span>
+          <div class="scene-pills">
+            <button class="scene-pill active" data-scene="arena" title="Arena Draftout">⚔️ Arena</button>
+            <button class="scene-pill" data-scene="minecraft" title="Minecraft Dusk">🌲 Minecraft</button>
+            <button class="scene-pill" data-scene="studio" title="Dark Studio">🌑 Studio</button>
+            <button class="scene-pill" data-scene="chroma" title="Chroma Green (Transparencia)">🟩 Chroma</button>
+            <button class="scene-pill" data-scene="grid" title="Rejilla Transparente">🏁 Rejilla</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulator Canvas (16:9 Aspect Ratio) -->
+      <div class="sim-canvas-viewport">
+        <div class="screen-sim" id="screen-sim" data-scene="arena">
+          <div class="screen-bg" id="screen-bg"></div>
+          
+          <!-- Interactive Corner Click Targets for Quick Drag/Positioning -->
+          <div class="sim-corner-target sim-ct-tl" data-corner="top-left" title="Mover a Arriba Izq">↖</div>
+          <div class="sim-corner-target sim-ct-tr" data-corner="top-right" title="Mover a Arriba Der">↗</div>
+          <div class="sim-corner-target sim-ct-ml" data-corner="middle-left" title="Mover a Medio Izq">←</div>
+          <div class="sim-corner-target sim-ct-mr" data-corner="middle-right" title="Mover a Medio Der">→</div>
+          <div class="sim-corner-target sim-ct-bl" data-corner="bottom-left" title="Mover a Abajo Izq">↙</div>
+          <div class="sim-corner-target sim-ct-br" data-corner="bottom-right" title="Mover a Abajo Der">↘</div>
+
+          <!-- Overlay Container in Canvas -->
+          <div class="screen-overlay-wrap notranslate" id="preview-wrap" data-pos="bottom-left" translate="no">
+            <div id="preview-widget" class="notranslate" translate="no"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Sync & Quick Actions Bar -->
+      <div class="simulator-footer">
+        <div class="sim-status-info">
+          <div class="status-dot" id="status-dot"></div>
+          <span class="status-text" id="status-text" data-i18n="statusInit">Introduce tu usuario o usa un demo rápido</span>
+        </div>
+        <div class="sim-quick-actions">
+          <button id="sim-copy-btn" class="sim-action-btn" title="Copiar URL rápida">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span data-i18n="btnCopyUrlShort">Copiar URL</span>
+          </button>
+        </div>
+      </div>
+
+    </main>
+
+  </div><!-- /studio-layout -->
+
+</div><!-- /#app -->
+
+<!-- Scripts -->
+<script src="js/api.js"></script>
+<script src="js/widget.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

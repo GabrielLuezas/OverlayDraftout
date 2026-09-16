@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google" content="notranslate" />
+  <title>Draftout Overlay — OBS Browser Source</title>
+  <style>
+    /* Transparent page for OBS */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: transparent !important;
+    }
+  </style>
+  <link rel="stylesheet" href="css/overlay.css" />
+</head>
+<body class="notranslate" translate="no">
+  <div class="ow-page notranslate" id="ow-page" data-pos="bottom-left" translate="no">
+    <div id="ow-container" class="notranslate" translate="no"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/widget.js"></script>
+  <script src="js/overlay.js"></script>
+</body>
+</html>
