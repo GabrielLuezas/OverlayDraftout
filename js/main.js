@@ -11,10 +11,10 @@
       headerTitle: 'DRAFTOUT STUDIO',
       headerSubtitle: 'Esports Broadcast HUD & Overlay Suite',
       headerBadge: 'STUDIO',
-      lblPresets: '⚡ Presets rápidos:',
-      presetStreamer: '🎮 Streamer Pro',
-      presetCompetitive: '⚔️ Competitivo',
-      presetMinimal: '💎 Minimalista',
+      lblPresets: 'Presets rápidos:',
+      presetStreamer: 'Streamer Pro',
+      presetCompetitive: 'Competitivo',
+      presetMinimal: 'Minimalista',
       // Tabs
       tabPlayer: 'Jugador',
       tabDesign: 'Diseño',
@@ -25,13 +25,16 @@
       phUsername: 'ej. bing_pigs',
       btnLoad: 'Cargar',
       lblDemoUsers: 'Ejemplos rápidos:',
+      lblSuggestions: 'Jugadores sugeridos',
+      lblSearchPlayers: 'Jugadores encontrados',
+      lblSearchAction: u => `Cargar "${u}"`,
       lblStatsSummary: 'Estadísticas competitivas',
       lblWr: 'Win Rate',
       lblWl: 'V / D',
       lblPeakElo: 'Peak ELO',
       lblStreak: 'Racha',
       // Design Tab
-      lblLayout: '📐 Formato del Overlay',
+      lblLayout: 'Formato del Overlay',
       layoutVert: 'Tarjeta (Vertical)',
       layoutVertDesc: 'Compacta · 2 filas · Ideal esports',
       layoutHori: 'Barra (Horizontal)',
@@ -87,10 +90,10 @@
       urlLabel: 'URL para Fuente de Navegador (OBS)',
       urlBadge: 'Listo para transmitir',
       urlPh: 'Configura tu usuario primero…',
-      btnCopy: '📋 Copiar URL',
-      btnCopied: '✓ ¡Copiado!',
-      btnOpenTab: '↗ Abrir',
-      obsTitle: '📺 Pasos de Configuración en OBS',
+      btnCopy: 'Copiar URL',
+      btnCopied: '¡Copiado!',
+      btnOpenTab: 'Abrir',
+      obsTitle: 'Pasos de Configuración en OBS',
       stepObs1: 'En OBS, crea una fuente: <strong>Navegador</strong> (Browser Source).',
       stepObs2: 'Pega la <strong>URL copiada</strong> en el campo URL.',
       stepObs3: 'Ajusta resolución a <code>1920 × 1080</code> (ancho x alto).',
@@ -102,11 +105,14 @@
       statusInit: 'Introduce tu usuario o usa un demo rápido',
       statusLoading: u => `Cargando datos de ${u}…`,
       statusNotFound: u => `Jugador "${u}" no encontrado en Draftout`,
-      statusCors: 'CORS bloqueado desde file://. Vista previa usa datos simulados — cargará datos reales en OBS ✓',
+      statusCors: 'CORS bloqueado desde file://. Vista previa usa datos simulados — cargará datos reales en OBS',
       statusOk: data => {
         const p = data?.player, r = data?.record;
         return p ? `${p.username} · ${p.rankName} · ${p.elo} ELO · ${r?.wins ?? 0}V ${r?.losses ?? 0}D` : '';
       },
+      // Discord Contact
+      contactTitle: '¿Sugerencias o Bugs?',
+      contactSub: 'Contactame en Discord: <strong>@GabrielLucifer22</strong>',
     },
     en: {
       pageTitle: 'Draftout Studio — Esports Overlay Suite for OBS',
@@ -114,10 +120,10 @@
       headerTitle: 'DRAFTOUT STUDIO',
       headerSubtitle: 'Esports Broadcast HUD & Overlay Suite',
       headerBadge: 'STUDIO',
-      lblPresets: '⚡ Quick Presets:',
-      presetStreamer: '🎮 Streamer Pro',
-      presetCompetitive: '⚔️ Competitive',
-      presetMinimal: '💎 Minimalist',
+      lblPresets: 'Quick Presets:',
+      presetStreamer: 'Streamer Pro',
+      presetCompetitive: 'Competitive',
+      presetMinimal: 'Minimalist',
       // Tabs
       tabPlayer: 'Player',
       tabDesign: 'Design',
@@ -128,13 +134,16 @@
       phUsername: 'e.g. bing_pigs',
       btnLoad: 'Load',
       lblDemoUsers: 'Quick demos:',
+      lblSuggestions: 'Suggested players',
+      lblSearchPlayers: 'Found players',
+      lblSearchAction: u => `Load "${u}"`,
       lblStatsSummary: 'Competitive Statistics',
       lblWr: 'Win Rate',
       lblWl: 'W / L',
       lblPeakElo: 'Peak ELO',
       lblStreak: 'Streak',
       // Design Tab
-      lblLayout: '📐 Overlay Format',
+      lblLayout: 'Overlay Format',
       layoutVert: 'Card (Vertical)',
       layoutVertDesc: 'Compact · 2 rows · Esports ready',
       layoutHori: 'Bar (Horizontal)',
@@ -190,10 +199,10 @@
       urlLabel: 'OBS Browser Source URL',
       urlBadge: 'Stream Ready',
       urlPh: 'Set your username first…',
-      btnCopy: '📋 Copy URL',
-      btnCopied: '✓ Copied!',
-      btnOpenTab: '↗ Open',
-      obsTitle: '📺 OBS Setup Instructions',
+      btnCopy: 'Copy URL',
+      btnCopied: 'Copied!',
+      btnOpenTab: 'Open',
+      obsTitle: 'OBS Setup Instructions',
       stepObs1: 'In OBS, add a new source: <strong>Browser Source</strong>.',
       stepObs2: 'Paste the <strong>copied URL</strong> into the URL field.',
       stepObs3: 'Set the resolution to <code>1920 × 1080</code> (width x height).',
@@ -205,11 +214,14 @@
       statusInit: 'Enter your username or click a quick demo',
       statusLoading: u => `Loading data for ${u}…`,
       statusNotFound: u => `Player "${u}" not found on Draftout`,
-      statusCors: 'CORS blocked from file://. Preview uses demo stats — real stats load in OBS ✓',
+      statusCors: 'CORS blocked from file://. Preview uses demo stats — real stats load in OBS',
       statusOk: data => {
         const p = data?.player, r = data?.record;
         return p ? `${p.username} · ${p.rankName} · ${p.elo} ELO · ${r?.wins ?? 0}W ${r?.losses ?? 0}L` : '';
       },
+      // Discord Contact
+      contactTitle: 'Suggestions or Bugs?',
+      contactSub: 'Contact me on Discord: <strong>@GabrielLucifer22</strong>',
     },
   };
 
@@ -546,6 +558,8 @@
     });
   }
 
+
+
   // ── Wire Inputs & Interactions ───────────────────────────────
   function wireInputs() {
     // 1. Studio Tabs
@@ -570,20 +584,22 @@
       btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
     });
 
-    // 3. Username & Load
-    const uInput = $('input-username');
-    uInput.addEventListener('input', () => {
-      cfg.username = uInput.value;
+    // 3. Username Autocomplete & Load
+    $('btn-load').addEventListener('click', loadPlayer);
+    $('input-username').addEventListener('input', (e) => {
+      cfg.username = e.target.value;
       updatePreview();
     });
-    uInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadPlayer(); });
-    $('btn-load').addEventListener('click', loadPlayer);
+    $('input-username').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loadPlayer();
+    });
 
     // 4. Quick Demo User Chips
     document.querySelectorAll('.demo-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         const uname = chip.dataset.user;
-        uInput.value = uname;
+        const uInput = $('input-username');
+        if (uInput) uInput.value = uname;
         cfg.username = uname;
         loadPlayer();
       });
@@ -787,7 +803,7 @@
     } catch (_) {}
 
     try {
-      leaderboard = await DraftoutAPI.getLeaderboard({ limit: 20 });
+      leaderboard = await DraftoutAPI.getLeaderboard({ limit: 50 });
       updatePreview();
     } catch (_) {}
   }

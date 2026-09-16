@@ -7,9 +7,21 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const endpoint = req.query.endpoint || '';
+  let endpoint = req.query.endpoint || '';
   if (!endpoint) {
     return res.status(400).json({ error: 'Missing endpoint query parameter' });
+  }
+
+  // Preserve any additional query parameters passed to /api/proxy
+  const extraParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(req.query)) {
+    if (key !== 'endpoint') {
+      extraParams.append(key, value);
+    }
+  }
+  const extraQs = extraParams.toString();
+  if (extraQs) {
+    endpoint += (endpoint.includes('?') ? '&' : '?') + extraQs;
   }
 
   const targetUrl = `https://draftoutmc.com/api/${endpoint}`;

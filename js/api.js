@@ -94,5 +94,7 @@ const DraftoutAPI = (() => {
       if (era != null) params.set('era', era);
       return fetchEndpoint(`stats?${params}`);
     },
+
+
   };
 })();
