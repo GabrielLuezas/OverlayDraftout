@@ -2,58 +2,67 @@
  * Draftout API Module
  * Community API: https://draftoutmc.com
  * Spec: https://github.com/memerson12/draftout-api-spec
+ * Supports Vercel Serverless Proxy (Zero CORS), Direct OBS Fetch & Fallbacks
  */
 const DraftoutAPI = (() => {
   const BASE = 'https://draftoutmc.com';
 
-  // Multiple CORS proxy options — tried in order until one succeeds
-  const PROXIES = [
-    // allorigins: wraps in { contents: "..." }
-    (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-    // corsproxy.io: returns raw response
-    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-    // thingproxy: returns raw response
-    (url) => `https://thingproxy.freeboard.io/fetch/${url}`,
-  ];
+  async function fetchEndpoint(endpointPath) {
+    const isHosted = typeof location !== 'undefined' && location.protocol.startsWith('http');
 
-  async function tryFetch(fetchUrl, parseAllorigins = false) {
-    const res = await fetch(fetchUrl, { headers: { Accept: 'application/json' } });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    // allorigins wraps the JSON string in { contents: "..." }
-    if (parseAllorigins && data && typeof data.contents === 'string') {
-      return JSON.parse(data.contents);
+    // 1) When hosted on Vercel, use same-origin serverless proxy or rewrite (100% bypasses CORS!)
+    if (isHosted) {
+      // 1A) Vercel rewrite rule: /api/draftout/...
+      try {
+        const res = await fetch(`/api/draftout/${endpointPath}`, {
+          headers: { Accept: 'application/json' },
+        });
+        if (res.ok) return await res.json();
+      } catch (_) {}
+
+      // 1B) Vercel Serverless Function: /api/proxy?endpoint=...
+      try {
+        const res = await fetch(`/api/proxy?endpoint=${encodeURIComponent(endpointPath)}`, {
+          headers: { Accept: 'application/json' },
+        });
+        if (res.ok) return await res.json();
+      } catch (_) {}
     }
-    return data;
-  }
 
-  async function fetchJSON(url) {
-    // 1) Try direct (works in OBS, fails locally due to CORS)
+    // 2) Try direct fetch to draftoutmc.com (works in OBS Browser Source!)
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 3500);
-      const res = await fetch(url, {
+      const timer = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(`${BASE}/api/${endpointPath}`, {
         signal: controller.signal,
         headers: { Accept: 'application/json' },
-        mode: 'cors',
       });
       clearTimeout(timer);
       if (res.ok) return await res.json();
-    } catch (_) { /* fall through to proxies */ }
+    } catch (_) {}
 
-    // 2) Try each proxy in sequence
-    const errors = [];
-    for (let i = 0; i < PROXIES.length; i++) {
+    // 3) CORS fallback proxies for local testing
+    const targetUrl = `${BASE}/api/${endpointPath}`;
+    const proxies = [
+      (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+      (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+    ];
+
+    for (const pFn of proxies) {
       try {
-        const proxyUrl = PROXIES[i](url);
-        const isAllorigins = proxyUrl.includes('allorigins');
-        return await tryFetch(proxyUrl, isAllorigins);
-      } catch (e) {
-        errors.push(e.message);
-      }
+        const pUrl = pFn(targetUrl);
+        const res = await fetch(pUrl, { headers: { Accept: 'application/json' } });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.contents === 'string') {
+            return JSON.parse(data.contents);
+          }
+          return data;
+        }
+      } catch (_) {}
     }
 
-    throw new Error(`No se pudo cargar datos. Errores: ${errors.join(', ')}`);
+    throw new Error('No se pudo conectar con la API de Draftout.');
   }
 
   return {
@@ -65,14 +74,14 @@ const DraftoutAPI = (() => {
     getPlayerStats(username, { page = 1, filter = 'competitive', era } = {}) {
       const params = new URLSearchParams({ page, filter });
       if (era != null) params.set('era', era);
-      return fetchJSON(`${BASE}/api/stats/${encodeURIComponent(username)}?${params}`);
+      return fetchEndpoint(`stats/${encodeURIComponent(username)}?${params}`);
     },
 
     /**
      * Get all rank bands in ascending order.
      */
     getRanks() {
-      return fetchJSON(`${BASE}/api/ranks`);
+      return fetchEndpoint('ranks');
     },
 
     /**
@@ -83,8 +92,7 @@ const DraftoutAPI = (() => {
       const params = new URLSearchParams({ metric, limit });
       if (q) params.set('q', q);
       if (era != null) params.set('era', era);
-      return fetchJSON(`${BASE}/api/stats?${params}`);
+      return fetchEndpoint(`stats?${params}`);
     },
   };
 })();
-
