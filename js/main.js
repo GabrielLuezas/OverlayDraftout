@@ -8,7 +8,7 @@
     es: {
       pageTitle: 'Draftout Studio — Overlay para OBS',
       pageDesc: 'Overlay de Draftout para OBS. Muestra a tu audiencia tus estadísticas, rango y el progreso de tus últimas partidas en directo.',
-      headerTitle: 'DRAFTOUT STUDIO',
+      headerTitle: 'OVERLAY DRAFTOUT',
       headerSubtitle: 'Esports Broadcast HUD & Overlay Suite',
       headerBadge: 'STUDIO',
       lblPresets: 'Presets rápidos:',
@@ -122,7 +122,7 @@
     en: {
       pageTitle: 'Draftout Studio — OBS Overlay',
       pageDesc: 'Draftout overlay for OBS. Show your audience your stats, rank, and recent match progress live on stream.',
-      headerTitle: 'DRAFTOUT STUDIO',
+      headerTitle: 'OVERLAY DRAFTOUT',
       headerSubtitle: 'Esports Broadcast HUD & Overlay Suite',
       headerBadge: 'STUDIO',
       lblPresets: 'Quick Presets:',
