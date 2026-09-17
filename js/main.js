@@ -90,6 +90,7 @@
       posBottomRight: 'Abajo Der ↘',
       urlLabel: 'URL para Fuente de Navegador (OBS)',
       urlBadge: 'Listo para transmitir',
+      urlHint: '⚠️ Al cambiar el diseño, copia la URL de nuevo a OBS.',
       urlPh: 'Configura tu usuario primero…',
       btnCopy: 'Copiar URL',
       btnCopied: '¡Copiado!',
@@ -198,8 +199,9 @@
       posMidRight: 'Middle Right →',
       posBottomLeft: '↙ Bottom Left',
       posBottomRight: 'Bottom Right ↘',
-      urlLabel: 'OBS Browser Source URL',
-      urlBadge: 'Stream Ready',
+      urlLabel: 'Browser Source URL (OBS)',
+      urlBadge: 'Ready to stream',
+      urlHint: '⚠️ When changing settings, copy the URL to OBS again.',
       urlPh: 'Set your username first…',
       btnCopy: 'Copy URL',
       btnCopied: 'Copied!',
@@ -318,14 +320,15 @@
 
   // ── Hero Profile Card Sync ───────────────────────────────────
   function updateProfileHero() {
+    const isLive = !!liveStats;
     const p = liveStats?.player || DraftoutWidget.MOCK.player;
     const r = liveStats?.record || DraftoutWidget.MOCK.record;
     const a = liveStats?.aggregate || DraftoutWidget.MOCK.aggregate;
 
     const uname = cfg.username.trim() || p.username || 'YourUsername';
-    const rColor = p.rankColor || '#D7D284';
-    const rName  = p.rankName  || 'Evoker III';
-    const eloVal = p.elo != null ? Number(p.elo).toLocaleString() : '1,566';
+    const rColor = p?.rankColor || (isLive ? '#888888' : '#D7D284');
+    const rName  = p?.rankName  || (isLive ? 'Unranked' : 'Evoker III');
+    const eloVal = p?.elo != null ? Number(p.elo).toLocaleString() : (isLive ? '--' : '1,566');
 
     const uEl = $('deck-username');
     if (uEl) uEl.textContent = uname;
@@ -357,16 +360,16 @@
 
     // Mini stats
     const wrEl = $('stat-wr');
-    if (wrEl && r?.winRate != null) wrEl.textContent = `${Math.round(r.winRate * 100)}%`;
+    if (wrEl) wrEl.textContent = r?.winRate != null ? `${Math.round(r.winRate * 100)}%` : (isLive ? '0%' : '88%');
 
     const wlEl = $('stat-wl');
     if (wlEl) wlEl.innerHTML = `${r?.wins ?? 0}W <span class="stat-loss">${r?.losses ?? 0}L</span>`;
 
     const peakEl = $('stat-peak');
-    if (peakEl) peakEl.textContent = Number(a?.peakElo || 1590).toLocaleString();
+    if (peakEl) peakEl.textContent = a?.peakElo != null ? Number(a.peakElo).toLocaleString() : (isLive ? '--' : '1,590');
 
     const streakEl = $('stat-streak');
-    if (streakEl) streakEl.textContent = `🔥 ${a?.bestStreak || 12}`;
+    if (streakEl) streakEl.textContent = a?.bestStreak != null ? a.bestStreak : (isLive ? '0' : '12');
 
     const srcEl = $('deck-data-source');
     if (srcEl) srcEl.textContent = liveStats ? (cfg.lang === 'es' ? 'Datos en directo ✓' : 'Live Data ✓') : (cfg.lang === 'es' ? 'Datos demostración' : 'Demo Data');
