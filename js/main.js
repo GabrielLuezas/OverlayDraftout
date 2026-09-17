@@ -6,8 +6,8 @@
   // ── i18n Translations Dictionary ──────────────────────────────
   const I18N = {
     es: {
-      pageTitle: 'Draftout Studio — Overlay Esports Suite para OBS',
-      pageDesc: 'Diseña y personaliza tu overlay competitivo de Draftout para OBS y Streamlabs en segundos. Estadísticas en tiempo real y estética esports premium.',
+      pageTitle: 'Draftout Studio — Overlay para OBS',
+      pageDesc: 'Overlay de Draftout para OBS. Muestra a tu audiencia tus estadísticas, rango y el progreso de tus últimas partidas en directo.',
       headerTitle: 'DRAFTOUT STUDIO',
       headerSubtitle: 'Esports Broadcast HUD & Overlay Suite',
       headerBadge: 'STUDIO',
@@ -120,8 +120,8 @@
       contactSub: 'Contactame en Discord: <strong>@GabrielLucifer22</strong>',
     },
     en: {
-      pageTitle: 'Draftout Studio — Esports Overlay Suite for OBS',
-      pageDesc: 'Design and customize your competitive Draftout overlay for OBS and Streamlabs in seconds. Real-time stats, smart rotation, and premium esports design.',
+      pageTitle: 'Draftout Studio — OBS Overlay',
+      pageDesc: 'Draftout overlay for OBS. Show your audience your stats, rank, and recent match progress live on stream.',
       headerTitle: 'DRAFTOUT STUDIO',
       headerSubtitle: 'Esports Broadcast HUD & Overlay Suite',
       headerBadge: 'STUDIO',
@@ -615,6 +615,7 @@
       'toggle-peak':          'showPeak',
       'toggle-global-rank':   'showGlobalRank',
       'toggle-ranking-slide': 'showRankingSlide',
+      'toggle-lastmatch-slide':'showLastmatchSlide',
       'toggle-records-slide': 'showRecordsSlide',
       'toggle-recent-slide':  'showRecentSlide',
     };
@@ -622,6 +623,11 @@
       const el = $(id);
       if (el) el.checked = !!cfg[k];
     });
+
+    const userIn = $('input-username');
+    if (userIn && cfg.username) {
+      userIn.value = cfg.username;
+    }
   }
 
 
@@ -875,6 +881,10 @@
       leaderboard = await DraftoutAPI.getLeaderboard({ limit: 50 });
       updatePreview();
     } catch (_) {}
+
+    if (cfg.username) {
+      loadPlayer();
+    }
   }
 
   if (document.readyState === 'loading') {
