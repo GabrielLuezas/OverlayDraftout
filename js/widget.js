@@ -16,11 +16,11 @@ const DraftoutWidget = (() => {
     },
     aggregate: { peakElo: 1590, bestStreak: 12, fastestWinMs: 861628, forfeitCount: 0 },
     matches: [
-      { participants: [{ username: 'YourUsername', won: true,  eloChange: +21 }, { username: 'DragonSlayer99', won: false, eloChange: -21 }] },
-      { participants: [{ username: 'YourUsername', won: true,  eloChange: +18 }, { username: 'CraftMaster_X',  won: false, eloChange: -18 }] },
-      { participants: [{ username: 'YourUsername', won: true,  eloChange: +15 }, { username: 'NightOwl_Pro',   won: false, eloChange: -15 }] },
-      { participants: [{ username: 'YourUsername', won: false, eloChange: -10 }, { username: 'SpeedRunner42',  won: true,  eloChange: +10 }] },
-      { participants: [{ username: 'YourUsername', won: true,  eloChange: +12 }, { username: 'BlockBreaker7',  won: false, eloChange: -12 }] },
+      { participants: [{ username: 'YourUsername', won: true, score: 25, eloChange: +21 }, { username: 'DragonSlayer99', won: false, score: 14, eloChange: -21 }] },
+      { participants: [{ username: 'YourUsername', won: true, score: 25, eloChange: +18 }, { username: 'CraftMaster_X',  won: false, score: 21, eloChange: -18 }] },
+      { participants: [{ username: 'YourUsername', won: true, score: 25, eloChange: +15 }, { username: 'NightOwl_Pro',   won: false, score: 9, eloChange: -15 }] },
+      { participants: [{ username: 'YourUsername', won: false, score: 11, eloChange: -10 }, { username: 'SpeedRunner42',  won: true, score: 25, eloChange: +10 }] },
+      { participants: [{ username: 'YourUsername', won: true, score: 25, eloChange: +12 }, { username: 'BlockBreaker7',  won: false, score: 0, eloChange: -12 }] },
     ],
   };
 
@@ -112,6 +112,8 @@ const DraftoutWidget = (() => {
       MAX_RANK:   'MAX',
       NO_RECENT:  'No matches',
       TOP_LB:     '#1 RANKING',
+      LAST_WIN:   'Win',
+      LAST_LOSS:  'Loss',
       eloToNext:  n => `A ${n} ELO`,
       eloRival:   n => `A ${n} ELO`,
       aboveRival: u => `↑ ${u}`,
@@ -126,6 +128,8 @@ const DraftoutWidget = (() => {
       MAX_RANK:   'MAX',
       NO_RECENT:  'Sin partidas',
       TOP_LB:     '#1 RANKING',
+      LAST_WIN:   'Victoria',
+      LAST_LOSS:  'Derrota',
       eloToNext:  n => `A ${n} ELO`,
       eloRival:   n => `A ${n} ELO`,
       aboveRival: u => `↑ ${u}`,
@@ -273,6 +277,60 @@ const DraftoutWidget = (() => {
   }
 
   // ════════════════════════════════════════════════════════════
+  // SLIDE 3.5 — Last Match (Última Partida)
+  // ════════════════════════════════════════════════════════════
+  function slideLastMatch(stats, cfg) {
+    const { player, matches } = stats;
+    const uname = player?.username || cfg.username;
+    const lastMatch = (matches || [])[0];
+    const t = T(cfg.lang);
+    const isVert = (cfg.layout || 'vertical') !== 'horizontal';
+
+    if (!lastMatch)
+      return `<div class="ow-meta-label" style="opacity:.6;text-align:center;width:100%">${t.NO_RECENT}</div>`;
+
+    const { me, opp } = matchParticipants(lastMatch, uname);
+    const change = me?.eloChange ?? 0;
+    const type = me?.won ? 'win' : 'loss';
+    const sign = change >= 0 ? '+' : '';
+    const oppUser = opp?.username || 'unknown';
+    
+    // Fallback to 0 if score doesn't exist
+    const myScore = me?.score ?? 0;
+    const oppScore = opp?.score ?? 0;
+    const resultText = `${myScore} - ${oppScore}`;
+    
+    if (isVert) {
+      return `
+        <div class="ow-slide-row" style="align-items:center; gap: 8px;">
+          ${mcHead(oppUser, 28, 'ow-mc-head')}
+          <div class="ow-stat-item" style="flex:1; align-items:flex-start;">
+            <span class="ow-bval" style="font-size:13px; max-width:80px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${oppUser}</span>
+            <span class="ow-meta-label">${resultText}</span>
+          </div>
+          <div class="ow-stat-item" style="text-align:right">
+            <span class="ow-bval ow-${type === 'win' ? 'green' : 'red'}">${sign}${change}</span>
+            <span class="ow-meta-label">ELO</span>
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="ow-block">
+        ${mcHead(oppUser, 24, 'ow-mc-head')}
+      </div>
+      <div class="ow-block" style="text-align:left; min-width:0;">
+        <div class="ow-bval" style="font-size:14px; max-width:100px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${oppUser}</div>
+        <div class="ow-meta-label">${resultText}</div>
+      </div>
+      <div class="ow-sep-line"></div>
+      <div class="ow-block">
+        <div class="ow-bval ow-${type === 'win' ? 'green' : 'red'}">${sign}${change}</div>
+        <div class="ow-meta-label">ELO</div>
+      </div>`;
+  }
+
+  // ════════════════════════════════════════════════════════════
   // SLIDE 4 — Records & Next on Leaderboard
   // ════════════════════════════════════════════════════════════
   function slideRecords(stats, cfg, ranks, leaderboard) {
@@ -344,14 +402,15 @@ const DraftoutWidget = (() => {
 
   // ── Slide registry ───────────────────────────────────────────
   const SLIDE_DEFS = {
-    main:    { label: 'Stats',     render: (s, c, r, lb) => slideMain(s, c) },
+    main:    { label: 'Principal', render: (s, c, r, lb) => slideMain(s, c) },
     ranking: { label: 'Ranking',   render: (s, c, r, lb) => slideRanking(s, c, r) },
+    lastmatch:{ label: 'Última Partida', render: (s, c, r, lb) => slideLastMatch(s, c) },
     recent:  { label: 'Recientes', render: (s, c, r, lb) => slideRecent(s, c) },
     records: { label: 'Récords',   render: (s, c, r, lb) => slideRecords(s, c, r, lb) },
   };
 
   function getActiveSlides(cfg) {
-    const all = ['main', 'ranking', 'recent', 'records'];
+    const all = ['main', 'ranking', 'lastmatch', 'recent', 'records'];
     return all.filter(id => {
       if (id === 'main') return true;
       const key = `show${id.charAt(0).toUpperCase() + id.slice(1)}Slide`;
