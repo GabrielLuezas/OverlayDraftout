@@ -110,6 +110,7 @@ const DraftoutWidget = (() => {
       MATCHES:    'MATCHES',
       PEAK_ELO:   'PEAK ELO',
       MAX_RANK:   'MAX',
+      STREAK:     'STREAK',
       NO_RECENT:  'No matches',
       TOP_LB:     '#1 RANKING',
       LAST_WIN:   'Win',
@@ -126,6 +127,7 @@ const DraftoutWidget = (() => {
       MATCHES:    'PARTIDAS',
       PEAK_ELO:   'PEAK ELO',
       MAX_RANK:   'MAX',
+      STREAK:     'RACHA',
       NO_RECENT:  'Sin partidas',
       TOP_LB:     '#1 RANKING',
       LAST_WIN:   'Victoria',
@@ -139,24 +141,26 @@ const DraftoutWidget = (() => {
   const T = lang => STRINGS[lang] || STRINGS.es;
 
   function mcHead(username, size = 32, cls = 'ow-mc-head') {
-    if (!username || username === 'unknown') {
+    const uname = (username || '').trim();
+    if (!uname || uname.toLowerCase() === 'unknown') {
       return `<div class="${cls} ow-mc-head-fallback"></div>`;
     }
     return `<img class="${cls}" 
-      src="https://mc-heads.net/avatar/${encodeURIComponent(username)}/${size}"
-      alt="${username}"
+      src="https://minotar.net/helm/${encodeURIComponent(uname)}/${size}.png"
+      alt="${uname}"
       loading="lazy"
       onerror="this.onerror=null;this.replaceWith(document.createElement('div'));this.className='${cls} ow-mc-head-fallback'"/>`;
   }
 
   function playerAvatar(username, rColor, size = 36) {
-    const uname = (!username || username === 'unknown') ? 'Steve' : username;
+    let uname = (username || '').trim();
+    if (!uname || uname.toLowerCase() === 'unknown') uname = 'Steve';
     return `<div class="ow-player-avatar notranslate" translate="no" style="--rc:${rColor}">
       <img class="ow-avatar-img"
-        src="https://mc-heads.net/avatar/${encodeURIComponent(uname)}/${size}"
+        src="https://minotar.net/helm/${encodeURIComponent(uname)}/${size}.png"
         alt="${uname}"
         loading="lazy"
-        onerror="this.onerror=null;this.src='https://mc-heads.net/avatar/Steve/${size}'"
+        onerror="this.onerror=null;this.src='https://minotar.net/helm/Steve/${size}.png'"
       />
     </div>`;
   }
@@ -180,7 +184,7 @@ const DraftoutWidget = (() => {
           ${cfg.showWL !== false && cfg.showWL !== '0' ? `
           <div class="ow-stat-item" style="text-align:right">
             <span class="ow-bval">${record?.wins ?? 0}W <span class="ow-losses">${record?.losses ?? 0}L</span></span>
-            <span class="ow-meta-label">${record?.completedMatches ?? 0} ${t.MATCHES}</span>
+            <span class="ow-meta-label">${record?.matches ?? 0} ${t.MATCHES}</span>
           </div>` : ''}
         </div>`;
     }
@@ -363,11 +367,22 @@ const DraftoutWidget = (() => {
     if (isVert) {
       return `
         <div class="ow-slide-row">
-          ${cfg.showPeak !== false && cfg.showPeak !== '0' ? `
-          <div class="ow-stat-item">
-            <span class="ow-bval ow-gold">🏆 ${fmt(aggregate?.peakElo)}</span>
-            <span class="ow-meta-label">${t.PEAK_ELO}</span>
-          </div>` : ''}
+          <div style="display:flex; gap:12px; align-items:center;">
+            ${cfg.showPeak !== false && cfg.showPeak !== '0' ? `
+            <div class="ow-stat-item">
+              <span class="ow-bval ow-gold">🏆 ${fmt(aggregate?.peakElo)}</span>
+              <span class="ow-meta-label">${t.PEAK_ELO}</span>
+            </div>` : ''}
+            ${cfg.showPeak !== false && cfg.showPeak !== '0' && cfg.showStreak !== false && cfg.showStreak !== '0' ? `<div style="width:1px;height:24px;background:rgba(255,255,255,0.1)"></div>` : ''}
+            ${cfg.showStreak !== false && cfg.showStreak !== '0' ? `
+            <div class="ow-stat-item">
+              <div class="ow-streak-block" style="color:#f97316;">
+                <span class="ow-streak-icon">🔥</span>
+                <span class="ow-streak-val">${computeStreak(stats.matches, player?.username).count}</span>
+              </div>
+              <span class="ow-meta-label">${t.STREAK}</span>
+            </div>` : ''}
+          </div>
           ${above && eloDiff != null ? `
           <div class="ow-rival-block">
             ${mcHead(above.username, 24, 'ow-mc-head-sm')}
@@ -381,7 +396,7 @@ const DraftoutWidget = (() => {
             <span class="ow-meta-label">${t.TOP_LB}</span>
           </div>` : (cfg.showMatches !== false && cfg.showMatches !== '0' ? `
           <div class="ow-stat-item" style="text-align:right">
-            <span class="ow-bval">${record?.completedMatches ?? 0}</span>
+            <span class="ow-bval">${record?.matches ?? 0}</span>
             <span class="ow-meta-label">${t.MATCHES}</span>
           </div>` : ''))}
         </div>`;
@@ -393,6 +408,17 @@ const DraftoutWidget = (() => {
       <div class="ow-block">
         <div class="ow-bval ow-gold">${fmt(aggregate?.peakElo)}</div>
         <div class="ow-meta-label">${t.PEAK_ELO}</div>
+      </div>`);
+    }
+    
+    if (cfg.showStreak !== false && cfg.showStreak !== '0') {
+      blocks.push(`
+      <div class="ow-block">
+        <div class="ow-streak-block" style="color:#f97316; justify-content:center;">
+          <span class="ow-streak-icon">🔥</span>
+          <span class="ow-streak-val" style="font-size:16px;">${computeStreak(stats.matches, player?.username).count}</span>
+        </div>
+        <div class="ow-meta-label">${t.STREAK}</div>
       </div>`);
     }
     
@@ -414,7 +440,7 @@ const DraftoutWidget = (() => {
     } else if (cfg.showMatches !== false && cfg.showMatches !== '0') {
       blocks.push(`
       <div class="ow-block">
-        <div class="ow-bval ow-green">${record?.completedMatches ?? '--'}</div>
+        <div class="ow-bval ow-green">${record?.matches ?? '--'}</div>
         <div class="ow-meta-label">${t.MATCHES}</div>
       </div>`);
     }
