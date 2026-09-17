@@ -95,6 +95,9 @@
       btnCopy: 'Copiar URL',
       btnCopied: '¡Copiado!',
       btnOpenTab: 'Abrir',
+      prefsMsg: '¿Deseas guardar tus ajustes de diseño en este navegador para no tener que configurarlos cada vez?',
+      prefsYes: 'Sí, guardar',
+      prefsNo: 'No, gracias',
       obsTitle: 'Pasos de Configuración en OBS',
       stepObs1: 'En OBS, crea una fuente: <strong>Navegador</strong> (Browser Source).',
       stepObs2: 'Pega la <strong>URL copiada</strong> en el campo URL.',
@@ -206,6 +209,9 @@
       btnCopy: 'Copy URL',
       btnCopied: 'Copied!',
       btnOpenTab: 'Open',
+      prefsMsg: 'Would you like to save your design settings in this browser so you do not have to reconfigure them every time?',
+      prefsYes: 'Yes, save',
+      prefsNo: 'No, thanks',
       obsTitle: 'OBS Setup Instructions',
       stepObs1: 'In OBS, add a new source: <strong>Browser Source</strong>.',
       stepObs2: 'Paste the <strong>copied URL</strong> into the URL field.',
@@ -231,8 +237,22 @@
 
   // ── Default config ────────────────────────────────────────────
   const DEFAULTS = {
+    // Identity
     username:          '',
-    // Element toggles
+    // Core layout
+    layout:            'vertical', // vertical | horizontal
+    position:          'bottom-left', // top-left, middle-left, etc.
+    // Rotation
+    rotationSpeed:     5,
+    showRankingSlide:  true,
+    showLastmatchSlide:true,
+    showRecordsSlide:  true,
+    showRecentSlide:   true,
+    // Appearance
+    theme:             'dark',
+    scale:             1,
+    accent:            '#6366f1',
+    // Toggles
     showRankIcon:      true,
     showElo:           true,
     showWL:            true,
@@ -241,18 +261,7 @@
     showMatches:       true,
     showPeak:          true,
     showGlobalRank:    true,
-    // Rotation
-    rotationSpeed:     5,
-    showRankingSlide:  true,
-    showLastmatchSlide:true,
-    showRecordsSlide:  true,
-    showRecentSlide:   true,
-    // Appearance
-    layout:            'vertical',
-    position:          'bottom-left',
-    scale:             1,
-    theme:             'dark',
-    accent:            '#6366f1',
+    // System
     lang:              'es',
     // Timing
     refresh:           60,
@@ -267,7 +276,57 @@
   let liveStats     = null;
   let ranks         = null;
   let leaderboard   = null;
+  let prefsConsent  = null;
   let currentStatus = { type: '', key: 'statusInit', params: null };
+
+  // ── Prefs Storage ─────────────────────────────────────────────
+  function loadConfigFromStorage() {
+    try {
+      const saved = localStorage.getItem('draftout_cfg');
+      if (saved) {
+        cfg = { ...cfg, ...JSON.parse(saved) };
+      }
+    } catch (e) {
+      console.warn('Failed to parse saved config');
+    }
+  }
+
+  function saveConfigToStorage() {
+    if (prefsConsent === '1') {
+      try {
+        localStorage.setItem('draftout_cfg', JSON.stringify(cfg));
+      } catch (e) {}
+    }
+  }
+
+  function checkPrefsConsent() {
+    try {
+      prefsConsent = localStorage.getItem('draftout_save_prefs');
+    } catch(e) {}
+    
+    if (prefsConsent === null) {
+      const banner = document.getElementById('prefs-banner');
+      if (banner) {
+        setTimeout(() => banner.classList.remove('hidden'), 1000);
+      }
+    } else if (prefsConsent === '1') {
+      loadConfigFromStorage();
+    }
+  }
+
+  function wirePrefs() {
+    document.getElementById('btn-prefs-accept')?.addEventListener('click', () => {
+      try { localStorage.setItem('draftout_save_prefs', '1'); } catch(e) {}
+      prefsConsent = '1';
+      document.getElementById('prefs-banner')?.classList.add('hidden');
+      saveConfigToStorage();
+    });
+    document.getElementById('btn-prefs-decline')?.addEventListener('click', () => {
+      try { localStorage.setItem('draftout_save_prefs', '0'); } catch(e) {}
+      prefsConsent = '0';
+      document.getElementById('prefs-banner')?.classList.add('hidden');
+    });
+  }
 
   const $ = (id) => document.getElementById(id);
 
@@ -276,7 +335,7 @@
     p.set('username', c.username);
     const bools = [
       'showRankIcon','showElo','showWL','showWinRate','showStreak','showMatches',
-      'showRankingSlide','showRecordsSlide','showRecentSlide',
+      'showRankingSlide','showLastmatchSlide','showRecordsSlide','showRecentSlide',
     ];
     bools.forEach(k => p.set(k, c[k] ? '1' : '0'));
     p.set('rotationSpeed', c.rotationSpeed);
@@ -429,6 +488,7 @@
     const urlOut = $('url-output');
     if (urlOut) urlOut.value = getOverlayURL();
     updateProfileHero();
+    saveConfigToStorage();
   }
 
   // ── Load Player Data ─────────────────────────────────────────
@@ -796,6 +856,9 @@
         cfg.lang = saved;
       }
     } catch (_) {}
+
+    checkPrefsConsent();
+    wirePrefs();
 
     wireInputs();
     setupCopyBtns();

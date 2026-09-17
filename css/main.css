@@ -1501,3 +1501,45 @@ body::before {
 .screen-overlay-wrap[data-pos="bottom-right"] { bottom: 0; right: 0; justify-content: flex-end; }
 
 /* Simulator Footer */
+
+/* ── Preferences Banner ── */
+.prefs-banner {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 320px;
+  background: rgba(14, 16, 28, 0.95);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  z-index: 9999;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  backdrop-filter: blur(12px);
+  transform: translateY(0);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+
+.prefs-banner.hidden {
+  transform: translateY(150%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.prefs-banner-content p {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.prefs-banner-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.prefs-banner-actions button {
+  flex: 1;
+  font-size: 12px;
+  padding: 8px 12px;
+  height: 34px;
+}
