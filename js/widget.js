@@ -172,27 +172,36 @@ const DraftoutWidget = (() => {
     if (isVert) {
       return `
         <div class="ow-slide-row">
+          ${cfg.showWinRate !== false && cfg.showWinRate !== '0' ? `
           <div class="ow-stat-item">
             <span class="ow-bval ow-green">${fmtWR(record?.winRate)}</span>
             <span class="ow-meta-label">${t.WIN_RATE}</span>
-          </div>
+          </div>` : ''}
+          ${cfg.showWL !== false && cfg.showWL !== '0' ? `
           <div class="ow-stat-item" style="text-align:right">
             <span class="ow-bval">${record?.wins ?? 0}W <span class="ow-losses">${record?.losses ?? 0}L</span></span>
             <span class="ow-meta-label">${record?.completedMatches ?? 0} ${t.MATCHES}</span>
-          </div>
+          </div>` : ''}
         </div>`;
     }
 
-    return `
+    const blocks = [];
+    if (cfg.showElo !== false && cfg.showElo !== '0') {
+      blocks.push(`
       <div class="ow-elo-block">
         <div class="ow-elo-val">${fmt(player?.elo)}</div>
         <div class="ow-meta-label">${t.ELO}</div>
-      </div>
-      <div class="ow-sep-line"></div>
+      </div>`);
+    }
+    if (cfg.showWinRate !== false && cfg.showWinRate !== '0') {
+      blocks.push(`
       <div class="ow-block">
         <div class="ow-bval ow-green" style="font-size:20px">${fmtWR(record?.winRate)}</div>
         <div class="ow-meta-label">${t.WIN_RATE}</div>
-      </div>`;
+      </div>`);
+    }
+    
+    return blocks.join('<div class="ow-sep-line"></div>');
   }
 
   // ════════════════════════════════════════════════════════════
@@ -225,7 +234,8 @@ const DraftoutWidget = (() => {
       return `
         <div class="ow-ranking-vert">
           <div class="ow-ranking-vert-header">
-            <div class="ow-bval ow-purple">#${player?.rank ?? '--'} <span class="ow-meta-label">${t.RANK}</span></div>
+            ${cfg.showGlobalRank !== false && cfg.showGlobalRank !== '0' ? `
+            <div class="ow-bval ow-purple">#${player?.rank ?? '--'} <span class="ow-meta-label">${t.RANK}</span></div>` : '<div></div>'}
             ${targetHtml}
           </div>
           <div class="ow-rank-bar-track">
@@ -234,18 +244,23 @@ const DraftoutWidget = (() => {
         </div>`;
     }
 
-    return `
+    const blocks = [];
+    if (cfg.showGlobalRank !== false && cfg.showGlobalRank !== '0') {
+      blocks.push(`
       <div class="ow-block">
         <div class="ow-bval ow-purple">#${player?.rank ?? '--'}</div>
         <div class="ow-meta-label">${t.RANK}</div>
-      </div>
-      <div class="ow-sep-line"></div>
+      </div>`);
+    }
+    blocks.push(`
       <div class="ow-rank-bar-wrap">
         <div class="ow-rank-bar-track">
           <div class="ow-rank-bar-fill" style="width:${fillPct}%;background:${barColor}"></div>
         </div>
         ${targetHtml}
-      </div>`;
+      </div>`);
+
+    return blocks.join('<div class="ow-sep-line"></div>');
   }
 
   // ════════════════════════════════════════════════════════════
@@ -348,10 +363,11 @@ const DraftoutWidget = (() => {
     if (isVert) {
       return `
         <div class="ow-slide-row">
+          ${cfg.showPeak !== false && cfg.showPeak !== '0' ? `
           <div class="ow-stat-item">
             <span class="ow-bval ow-gold">🏆 ${fmt(aggregate?.peakElo)}</span>
             <span class="ow-meta-label">${t.PEAK_ELO}</span>
-          </div>
+          </div>` : ''}
           ${above && eloDiff != null ? `
           <div class="ow-rival-block">
             ${mcHead(above.username, 24, 'ow-mc-head-sm')}
@@ -363,41 +379,47 @@ const DraftoutWidget = (() => {
           <div class="ow-stat-item" style="text-align:right">
             <span class="ow-bval ow-gold">🏆 #1</span>
             <span class="ow-meta-label">${t.TOP_LB}</span>
-          </div>` : `
+          </div>` : (cfg.showMatches !== false && cfg.showMatches !== '0' ? `
           <div class="ow-stat-item" style="text-align:right">
             <span class="ow-bval">${record?.completedMatches ?? 0}</span>
             <span class="ow-meta-label">${t.MATCHES}</span>
-          </div>`)}
+          </div>` : ''))}
         </div>`;
     }
 
-    return `
+    const blocks = [];
+    if (cfg.showPeak !== false && cfg.showPeak !== '0') {
+      blocks.push(`
       <div class="ow-block">
         <div class="ow-bval ow-gold">${fmt(aggregate?.peakElo)}</div>
         <div class="ow-meta-label">${t.PEAK_ELO}</div>
-      </div>
-      <div class="ow-sep-line"></div>
-      <div class="ow-block">
-        <div class="ow-bval ow-green">${record?.completedMatches ?? '--'}</div>
-        <div class="ow-meta-label">${t.MATCHES}</div>
-      </div>
-      <div class="ow-sep-line"></div>
-      ${above && eloDiff != null ? `
+      </div>`);
+    }
+    
+    if (above && eloDiff != null) {
+      blocks.push(`
       <div class="ow-rival-block">
         ${mcHead(above.username, 26, 'ow-mc-head-sm')}
         <div class="ow-rival-info">
           <div class="ow-bval ow-blue" style="font-size:14px">A ${eloDiff} ELO</div>
           <div class="ow-meta-label" style="white-space:nowrap">↑ ${above.username}</div>
         </div>
-      </div>` : (myRank === 1 ? `
+      </div>`);
+    } else if (myRank === 1) {
+      blocks.push(`
       <div class="ow-block">
         <div class="ow-bval ow-gold" style="font-size:14px">🏆 TOP</div>
         <div class="ow-meta-label">${t.TOP_LB}</div>
-      </div>` : `
+      </div>`);
+    } else if (cfg.showMatches !== false && cfg.showMatches !== '0') {
+      blocks.push(`
       <div class="ow-block">
-        <div class="ow-bval ow-purple" style="font-size:14px">#${myRank ?? '--'}</div>
-        <div class="ow-meta-label">${t.RANK}</div>
-      </div>`)}`;
+        <div class="ow-bval ow-green">${record?.completedMatches ?? '--'}</div>
+        <div class="ow-meta-label">${t.MATCHES}</div>
+      </div>`);
+    }
+
+    return blocks.join('<div class="ow-sep-line"></div>');
   }
 
   // ── Slide registry ───────────────────────────────────────────
@@ -450,15 +472,16 @@ const DraftoutWidget = (() => {
           
           <!-- ROW 1: Player info -->
           <div class="ow-row-header">
-            ${cfg.showRankIcon !== false ? playerAvatar(uname, rColor, 34) : ''}
+            ${cfg.showRankIcon !== false && cfg.showRankIcon !== '0' ? playerAvatar(uname, rColor, 34) : ''}
             <div class="ow-player-details">
               <div class="ow-username notranslate" translate="no">${uname}</div>
               <div class="ow-rank-name notranslate" translate="no" style="color:${rColor}">${rName}</div>
             </div>
+            ${cfg.showElo !== false && cfg.showElo !== '0' ? `
             <div class="ow-elo-badge">
               <span class="ow-elo-number">${eloVal}</span>
               <span class="ow-elo-badge-lbl">ELO</span>
-            </div>
+            </div>` : ''}
           </div>
 
           <!-- DIVIDER -->
@@ -474,7 +497,7 @@ const DraftoutWidget = (() => {
       container.innerHTML = `
         <div class="ow-widget notranslate" translate="no" data-layout="horizontal" data-theme="${theme}" style="--rc:${rColor};--ac:${accent};--sc:${scale}">
           <div class="ow-top-bar notranslate" translate="no"></div>
-          ${cfg.showRankIcon !== false ? playerAvatar(uname, rColor, 36) : ''}
+          ${cfg.showRankIcon !== false && cfg.showRankIcon !== '0' ? playerAvatar(uname, rColor, 36) : ''}
           <div class="ow-player notranslate" translate="no">
             <div class="ow-username notranslate" translate="no">${uname}</div>
             <div class="ow-rank-name notranslate" translate="no" style="color:${rColor}">${rName}</div>
