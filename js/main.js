@@ -425,10 +425,37 @@
     if (wlEl) wlEl.innerHTML = `${r?.wins ?? 0}W <span class="stat-loss">${r?.losses ?? 0}L</span>`;
 
     const peakEl = $('stat-peak');
-    if (peakEl) peakEl.textContent = a?.peakElo != null ? Number(a.peakElo).toLocaleString() : (isLive ? '--' : '1,590');
+    if (peakEl) {
+      const pElo = stats.player?.elo;
+      const aPeak = a?.peakElo;
+      const computedPeak = (aPeak != null || pElo != null) ? Math.max(aPeak || 0, pElo || 0) : null;
+      peakEl.textContent = computedPeak != null ? Number(computedPeak).toLocaleString() : (isLive ? '--' : '1,590');
+    }
 
     const streakEl = $('stat-streak');
-    if (streakEl) streakEl.textContent = a?.bestStreak != null ? a.bestStreak : (isLive ? '0' : '12');
+    if (streakEl) {
+      let currentStreak = 0; let streakType = null;
+      if (stats.matches?.length) {
+        for (const m of stats.matches) {
+          const p = m.participants?.find(pt => pt.username?.toLowerCase() === uname.toLowerCase());
+          if (!p) continue;
+          const r = p.won ? 'win' : 'loss';
+          if (!streakType) { streakType = r; currentStreak = 1; }
+          else if (r === streakType) currentStreak++;
+          else break;
+        }
+      }
+      if (streakType === 'loss') {
+        streakEl.textContent = currentStreak + 'L';
+        streakEl.style.color = '#ef4444';
+      } else if (streakType === 'win') {
+        streakEl.textContent = currentStreak + 'W';
+        streakEl.style.color = '#f97316';
+      } else {
+        streakEl.textContent = isLive ? '0' : '12W';
+        streakEl.style.color = isLive ? '#94a3b8' : '#f97316';
+      }
+    }
 
     const srcEl = $('deck-data-source');
     if (srcEl) srcEl.textContent = liveStats ? (cfg.lang === 'es' ? 'Datos en directo ✓' : 'Live Data ✓') : (cfg.lang === 'es' ? 'Datos demostración' : 'Demo Data');

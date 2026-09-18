@@ -364,24 +364,39 @@ const DraftoutWidget = (() => {
     }
     const eloDiff = (above && player?.elo != null) ? above.elo - player.elo : null;
 
+    const pElo = player?.elo;
+    const aPeak = aggregate?.peakElo;
+    const computedPeak = (aPeak != null || pElo != null) ? Math.max(aPeak || 0, pElo || 0) : null;
+
     if (isVert) {
       return `
         <div class="ow-slide-row">
           <div style="display:flex; gap:12px; align-items:center;">
             ${cfg.showPeak !== false && cfg.showPeak !== '0' ? `
             <div class="ow-stat-item">
-              <span class="ow-bval ow-gold">🏆 ${fmt(aggregate?.peakElo)}</span>
+              <span class="ow-bval ow-gold">🏆 ${fmt(computedPeak)}</span>
               <span class="ow-meta-label">${t.PEAK_ELO}</span>
             </div>` : ''}
             ${cfg.showPeak !== false && cfg.showPeak !== '0' && cfg.showStreak !== false && cfg.showStreak !== '0' ? `<div style="width:1px;height:24px;background:rgba(255,255,255,0.1)"></div>` : ''}
-            ${cfg.showStreak !== false && cfg.showStreak !== '0' ? `
-            <div class="ow-stat-item">
-              <div class="ow-streak-block" style="color:#f97316;">
-                <span class="ow-streak-icon">🔥</span>
-                <span class="ow-streak-val">${computeStreak(stats.matches, player?.username).count}</span>
-              </div>
-              <span class="ow-meta-label">${t.STREAK}</span>
-            </div>` : ''}
+            ${cfg.showStreak !== false && cfg.showStreak !== '0' ? (() => {
+              const streak = computeStreak(stats.matches, player?.username);
+              let icon = '🔥', color = '#f97316', val = streak.count;
+              if (streak.count === 0) {
+                icon = '➖'; color = '#94a3b8'; val = '0';
+              } else if (streak.type === 'loss') {
+                icon = '📉'; color = '#ef4444'; val = streak.count + 'L';
+              } else {
+                val = streak.count + 'W';
+              }
+              return `
+              <div class="ow-stat-item">
+                <div class="ow-streak-block" style="color:${color};">
+                  <span class="ow-streak-icon">${icon}</span>
+                  <span class="ow-streak-val">${val}</span>
+                </div>
+                <span class="ow-meta-label">${t.STREAK}</span>
+              </div>`;
+            })() : ''}
           </div>
           ${above && eloDiff != null ? `
           <div class="ow-rival-block">
@@ -406,17 +421,26 @@ const DraftoutWidget = (() => {
     if (cfg.showPeak !== false && cfg.showPeak !== '0') {
       blocks.push(`
       <div class="ow-block">
-        <div class="ow-bval ow-gold">${fmt(aggregate?.peakElo)}</div>
+        <div class="ow-bval ow-gold">${fmt(computedPeak)}</div>
         <div class="ow-meta-label">${t.PEAK_ELO}</div>
       </div>`);
     }
     
     if (cfg.showStreak !== false && cfg.showStreak !== '0') {
+      const streak = computeStreak(stats.matches, player?.username);
+      let icon = '🔥', color = '#f97316', val = streak.count;
+      if (streak.count === 0) {
+        icon = '➖'; color = '#94a3b8'; val = '0';
+      } else if (streak.type === 'loss') {
+        icon = '📉'; color = '#ef4444'; val = streak.count + 'L';
+      } else {
+        val = streak.count + 'W';
+      }
       blocks.push(`
       <div class="ow-block">
-        <div class="ow-streak-block" style="color:#f97316; justify-content:center;">
-          <span class="ow-streak-icon">🔥</span>
-          <span class="ow-streak-val" style="font-size:16px;">${computeStreak(stats.matches, player?.username).count}</span>
+        <div class="ow-streak-block" style="color:${color}; justify-content:center;">
+          <span class="ow-streak-icon">${icon}</span>
+          <span class="ow-streak-val" style="font-size:16px;">${val}</span>
         </div>
         <div class="ow-meta-label">${t.STREAK}</div>
       </div>`);
