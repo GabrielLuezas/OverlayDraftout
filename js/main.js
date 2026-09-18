@@ -426,7 +426,7 @@
 
     const peakEl = $('stat-peak');
     if (peakEl) {
-      const pElo = stats.player?.elo;
+      const pElo = p?.elo;
       const aPeak = a?.peakElo;
       const computedPeak = (aPeak != null || pElo != null) ? Math.max(aPeak || 0, pElo || 0) : null;
       peakEl.textContent = computedPeak != null ? Number(computedPeak).toLocaleString() : (isLive ? '--' : '1,590');
@@ -435,8 +435,9 @@
     const streakEl = $('stat-streak');
     if (streakEl) {
       let currentStreak = 0; let streakType = null;
-      if (stats.matches?.length) {
-        for (const m of stats.matches) {
+      const matchesToUse = liveStats ? liveStats.matches : DraftoutWidget.MOCK.matches;
+      if (matchesToUse?.length) {
+        for (const m of matchesToUse) {
           const p = m.participants?.find(pt => pt.username?.toLowerCase() === uname.toLowerCase());
           if (!p) continue;
           const r = p.won ? 'win' : 'loss';
