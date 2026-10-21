@@ -30,7 +30,7 @@
       lblSearchAction: u => `Cargar "${u}"`,
       lblStatsSummary: 'Estadísticas competitivas',
       lblWr: 'Win Rate',
-      lblWl: 'V / D / E',
+      lblWl: 'W / L / D',
       lblPeakElo: 'Peak ELO',
       lblStreak: 'Racha',
       // Design Tab
@@ -58,7 +58,7 @@
       optElo: 'Puntos ELO',
       optEloSub: 'Puntuación actual en directo',
       optWl: 'Victorias / Derrotas / Empates',
-      optWlSub: 'Contador W / L / E de la era',
+      optWlSub: 'Contador W / L / D de la era',
       optWinrate: 'Win Rate (%)',
       optWinrateSub: 'Porcentaje de victoria',
       optStreak: 'Racha actual',
@@ -114,7 +114,7 @@
       statusOk: data => {
         const p = data?.player, r = data?.record;
         const d = r?.draws ?? 0;
-        return p ? `${p.username} · ${p.rankName} · ${p.elo} ELO · ${r?.wins ?? 0}V ${r?.losses ?? 0}D ${d}E` : '';
+        return p ? `${p.username} · ${p.rankName} · ${p.elo} ELO · ${r?.wins ?? 0}V ${r?.losses ?? 0}D ${d}D` : '';
       },
       // Discord Contact
       contactTitle: '¿Sugerencias o Bugs?',
@@ -425,7 +425,7 @@
 
     const wlEl = $('stat-wl');
     if (wlEl) {
-      const drawChar = cfg.lang === 'es' ? 'E' : 'D';
+      const drawChar = 'D';
       const drawsCount = r?.draws ?? 0;
       wlEl.innerHTML = `${r?.wins ?? 0}W <span class="stat-loss">${r?.losses ?? 0}L</span> <span class="stat-draw">${drawsCount}${drawChar}</span>`;
     }

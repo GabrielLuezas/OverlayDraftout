@@ -201,7 +201,7 @@ const DraftoutWidget = (() => {
     const { player, record } = stats;
     const t = T(cfg.lang);
     const isVert = (cfg.layout || 'vertical') !== 'horizontal';
-    const drawChar = cfg.lang === 'es' ? 'E' : 'D';
+    const drawChar = 'D';
     const drawsCount = record?.draws ?? 0;
 
     if (isVert) {
