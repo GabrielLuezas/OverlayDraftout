@@ -708,6 +708,7 @@ body::before {
 }
 
 .stat-loss { color: var(--text-tertiary); font-weight: 600; font-size: 13px; }
+.stat-draw { color: #60a5fa; font-weight: 600; font-size: 13px; }
 .color-green { color: var(--green); }
 .color-gold  { color: var(--gold); }
 .color-fire  { color: #fb923c; }

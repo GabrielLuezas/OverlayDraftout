@@ -186,6 +186,11 @@
   color: #dc2626;
 }
 
+.ow-widget[data-theme="light"] .ow-draws,
+.ow-widget[data-theme="light"] .ow-recent-draw .ow-recent-chg {
+  color: #2563eb;
+}
+
 .ow-widget[data-theme="light"] .ow-wl-slash {
   color: #94a3b8;
 }
@@ -355,6 +360,7 @@
 }
 .ow-wins    { color: #4ade80; }
 .ow-losses  { color: #f87171; }
+.ow-draws   { color: #60a5fa; }
 .ow-wl-slash { color: rgba(255,255,255,0.25); font-weight: 400; }
 
 /* ── Streak block ───────────────────────────────────────────── */
@@ -415,7 +421,7 @@
 .ow-dot:hover  { transform: scale(1.3); }
 .ow-dot-win    { background: #4ade80; box-shadow: 0 0 5px #4ade80; }
 .ow-dot-loss   { background: #f87171; box-shadow: 0 0 5px #f87171; }
-.ow-dot-draw   { background: #facc15; box-shadow: 0 0 5px #facc15; }
+.ow-dot-draw   { background: #60a5fa; box-shadow: 0 0 5px #60a5fa; }
 .ow-dot-unknown{ background: rgba(255,255,255,0.2); }
 
 /* ── Refresh indicator dot ──────────────────────────────────── */
@@ -594,6 +600,7 @@
 }
 .ow-recent-win  .ow-recent-chg { color: #4ade80; }
 .ow-recent-loss .ow-recent-chg { color: #f87171; }
+.ow-recent-draw .ow-recent-chg { color: #60a5fa; }
 
 /* ── Minecraft player heads ──────────────────────────────────── */
 .ow-mc-head {

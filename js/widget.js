@@ -10,13 +10,14 @@ const DraftoutWidget = (() => {
       rankColor: '#D7D284', rank: 7, ranked: true, eraId: 2,
     },
     record: {
-      wins: 14, losses: 2, draws: 0, winRate: 0.875,
-      matches: 16, completedMatches: 12,
+      wins: 14, losses: 2, draws: 1, winRate: 0.824,
+      matches: 17, completedMatches: 13,
       averageFinishTime: 1436573, averageGoals: 4.33,
     },
     aggregate: { peakElo: 1590, bestStreak: 12, fastestWinMs: 861628, forfeitCount: 0 },
     matches: [
       { participants: [{ username: 'YourUsername', won: true, score: 25, eloChange: +21 }, { username: 'DragonSlayer99', won: false, score: 14, eloChange: -21 }] },
+      { outcome: 'draw_by_vote', participants: [{ username: 'YourUsername', won: false, score: 20, eloChange: +4 }, { username: 'TieMaster', won: false, score: 20, eloChange: -4 }] },
       { participants: [{ username: 'YourUsername', won: true, score: 25, eloChange: +18 }, { username: 'CraftMaster_X',  won: false, score: 21, eloChange: -18 }] },
       { participants: [{ username: 'YourUsername', won: true, score: 25, eloChange: +15 }, { username: 'NightOwl_Pro',   won: false, score: 9, eloChange: -15 }] },
       { participants: [{ username: 'YourUsername', won: false, score: 11, eloChange: -10 }, { username: 'SpeedRunner42',  won: true, score: 25, eloChange: +10 }] },
@@ -33,24 +34,50 @@ const DraftoutWidget = (() => {
   };
 
   // ── Helpers ──────────────────────────────────────────────────
-  function computeStreak(matches, username) {
-    if (!matches?.length) return { count: 0, type: 'none' };
-    let type = null, count = 0;
-    for (const m of matches) {
-      const p = m.participants?.find(pt => pt.username?.toLowerCase() === username?.toLowerCase());
-      if (!p) continue;
-      const r = p.won ? 'win' : 'loss';
-      if (!type) { type = r; count = 1; }
-      else if (r === type) count++;
-      else break;
-    }
-    return { count, type: type || 'none' };
-  }
-
   function matchParticipants(match, username) {
     const me  = match.participants?.find(pt => pt.username?.toLowerCase() === username?.toLowerCase());
     const opp = match.participants?.find(pt => pt.username?.toLowerCase() !== username?.toLowerCase());
     return { me, opp };
+  }
+
+  function getMatchOutcome(match, username) {
+    if (!match) return 'none';
+    const { me, opp } = matchParticipants(match, username);
+    if (!me) return 'none';
+    if (me.won) return 'win';
+
+    const isDraw =
+      (match.outcome && String(match.outcome).toLowerCase().includes('draw')) ||
+      match.draw === true ||
+      match.isDraw === true ||
+      me.draw === true ||
+      (opp && !me.won && !opp.won && match.outcome !== 'cancelled');
+
+    if (isDraw) return 'draw';
+    return 'loss';
+  }
+
+  function computeStreak(matches, username) {
+    if (!matches?.length) return { count: 0, type: 'none' };
+    let type = null, count = 0;
+    for (const m of matches) {
+      const outcome = getMatchOutcome(m, username);
+      if (outcome === 'draw') {
+        // Un empate corta la racha inmediatamente
+        break;
+      }
+      if (outcome === 'win' || outcome === 'loss') {
+        if (!type) {
+          type = outcome;
+          count = 1;
+        } else if (outcome === type) {
+          count++;
+        } else {
+          break;
+        }
+      }
+    }
+    return { count, type: type || 'none' };
   }
 
   const DEFAULT_RANKS = [
@@ -115,6 +142,7 @@ const DraftoutWidget = (() => {
       TOP_LB:     '#1 RANKING',
       LAST_WIN:   'Win',
       LAST_LOSS:  'Loss',
+      LAST_DRAW:  'Draw',
       eloToNext:  n => `A ${n} ELO`,
       eloRival:   n => `A ${n} ELO`,
       aboveRival: u => `↑ ${u}`,
@@ -132,6 +160,7 @@ const DraftoutWidget = (() => {
       TOP_LB:     '#1 RANKING',
       LAST_WIN:   'Victoria',
       LAST_LOSS:  'Derrota',
+      LAST_DRAW:  'Empate',
       eloToNext:  n => `A ${n} ELO`,
       eloRival:   n => `A ${n} ELO`,
       aboveRival: u => `↑ ${u}`,
@@ -172,6 +201,8 @@ const DraftoutWidget = (() => {
     const { player, record } = stats;
     const t = T(cfg.lang);
     const isVert = (cfg.layout || 'vertical') !== 'horizontal';
+    const drawChar = cfg.lang === 'es' ? 'E' : 'D';
+    const drawsCount = record?.draws ?? 0;
 
     if (isVert) {
       return `
@@ -183,7 +214,7 @@ const DraftoutWidget = (() => {
           </div>` : ''}
           ${cfg.showWL !== false && cfg.showWL !== '0' ? `
           <div class="ow-stat-item" style="text-align:right">
-            <span class="ow-bval">${record?.wins ?? 0}W <span class="ow-losses">${record?.losses ?? 0}L</span></span>
+            <span class="ow-bval">${record?.wins ?? 0}W <span class="ow-losses">${record?.losses ?? 0}L</span> <span class="ow-draws">${drawsCount}${drawChar}</span></span>
             <span class="ow-meta-label">${record?.matches ?? 0} ${t.MATCHES}</span>
           </div>` : ''}
         </div>`;
@@ -282,7 +313,7 @@ const DraftoutWidget = (() => {
     const items = recent.map(m => {
       const { me, opp } = matchParticipants(m, uname);
       const change  = me?.eloChange ?? 0;
-      const type    = me?.won ? 'win' : 'loss';
+      const type    = getMatchOutcome(m, uname);
       const sign    = change >= 0 ? '+' : '';
       const oppUser = opp?.username || 'unknown';
 
@@ -310,7 +341,7 @@ const DraftoutWidget = (() => {
 
     const { me, opp } = matchParticipants(lastMatch, uname);
     const change = me?.eloChange ?? 0;
-    const type = me?.won ? 'win' : 'loss';
+    const type = getMatchOutcome(lastMatch, uname);
     const sign = change >= 0 ? '+' : '';
     const oppUser = opp?.username || 'unknown';
     
@@ -318,6 +349,7 @@ const DraftoutWidget = (() => {
     const myScore = me?.score ?? 0;
     const oppScore = opp?.score ?? 0;
     const resultText = `${myScore} - ${oppScore}`;
+    const colorCls = type === 'win' ? 'ow-green' : (type === 'draw' ? 'ow-blue' : 'ow-red');
     
     if (isVert) {
       return `
@@ -328,7 +360,7 @@ const DraftoutWidget = (() => {
             <span class="ow-meta-label">${resultText}</span>
           </div>
           <div class="ow-stat-item" style="text-align:right">
-            <span class="ow-bval ow-${type === 'win' ? 'green' : 'red'}">${sign}${change}</span>
+            <span class="ow-bval ${colorCls}">${sign}${change}</span>
             <span class="ow-meta-label">ELO</span>
           </div>
         </div>`;
@@ -344,7 +376,7 @@ const DraftoutWidget = (() => {
       </div>
       <div class="ow-sep-line"></div>
       <div class="ow-block">
-        <div class="ow-bval ow-${type === 'win' ? 'green' : 'red'}">${sign}${change}</div>
+        <div class="ow-bval ${colorCls}">${sign}${change}</div>
         <div class="ow-meta-label">ELO</div>
       </div>`;
   }
@@ -594,5 +626,5 @@ const DraftoutWidget = (() => {
     container._slideIdx = slideIdx;
   }
 
-  return { render, MOCK, MOCK_LEADERBOARD };
+  return { render, computeStreak, getMatchOutcome, MOCK, MOCK_LEADERBOARD };
 })();

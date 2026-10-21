@@ -30,7 +30,7 @@
       lblSearchAction: u => `Cargar "${u}"`,
       lblStatsSummary: 'Estadísticas competitivas',
       lblWr: 'Win Rate',
-      lblWl: 'V / D',
+      lblWl: 'V / D / E',
       lblPeakElo: 'Peak ELO',
       lblStreak: 'Racha',
       // Design Tab
@@ -57,8 +57,8 @@
       optAvatarSub: 'Cabeza Minecraft de tu skin',
       optElo: 'Puntos ELO',
       optEloSub: 'Puntuación actual en directo',
-      optWl: 'Victorias / Derrotas',
-      optWlSub: 'Contador W / L de la era',
+      optWl: 'Victorias / Derrotas / Empates',
+      optWlSub: 'Contador W / L / E de la era',
       optWinrate: 'Win Rate (%)',
       optWinrateSub: 'Porcentaje de victoria',
       optStreak: 'Racha actual',
@@ -113,7 +113,8 @@
       statusCors: 'CORS bloqueado desde file://. Vista previa usa datos simulados — cargará datos reales en OBS',
       statusOk: data => {
         const p = data?.player, r = data?.record;
-        return p ? `${p.username} · ${p.rankName} · ${p.elo} ELO · ${r?.wins ?? 0}V ${r?.losses ?? 0}D` : '';
+        const d = r?.draws ?? 0;
+        return p ? `${p.username} · ${p.rankName} · ${p.elo} ELO · ${r?.wins ?? 0}V ${r?.losses ?? 0}D ${d}E` : '';
       },
       // Discord Contact
       contactTitle: '¿Sugerencias o Bugs?',
@@ -144,7 +145,7 @@
       lblSearchAction: u => `Load "${u}"`,
       lblStatsSummary: 'Competitive Statistics',
       lblWr: 'Win Rate',
-      lblWl: 'W / L',
+      lblWl: 'W / L / D',
       lblPeakElo: 'Peak ELO',
       lblStreak: 'Streak',
       // Design Tab
@@ -171,8 +172,8 @@
       optAvatarSub: 'Minecraft skin head avatar',
       optElo: 'ELO Points',
       optEloSub: 'Real-time live score',
-      optWl: 'Wins / Losses',
-      optWlSub: 'W / L counter for current era',
+      optWl: 'Wins / Losses / Draws',
+      optWlSub: 'W / L / D counter for current era',
       optWinrate: 'Win Rate (%)',
       optWinrateSub: 'Victory percentage',
       optStreak: 'Current Streak',
@@ -227,7 +228,8 @@
       statusCors: 'CORS blocked from file://. Preview uses demo stats — real stats load in OBS',
       statusOk: data => {
         const p = data?.player, r = data?.record;
-        return p ? `${p.username} · ${p.rankName} · ${p.elo} ELO · ${r?.wins ?? 0}W ${r?.losses ?? 0}L` : '';
+        const d = r?.draws ?? 0;
+        return p ? `${p.username} · ${p.rankName} · ${p.elo} ELO · ${r?.wins ?? 0}W ${r?.losses ?? 0}L ${d}D` : '';
       },
       // Discord Contact
       contactTitle: 'Suggestions or Bugs?',
@@ -422,7 +424,11 @@
     if (wrEl) wrEl.textContent = r?.winRate != null ? `${Math.round(r.winRate * 100)}%` : (isLive ? '0%' : '88%');
 
     const wlEl = $('stat-wl');
-    if (wlEl) wlEl.innerHTML = `${r?.wins ?? 0}W <span class="stat-loss">${r?.losses ?? 0}L</span>`;
+    if (wlEl) {
+      const drawChar = cfg.lang === 'es' ? 'E' : 'D';
+      const drawsCount = r?.draws ?? 0;
+      wlEl.innerHTML = `${r?.wins ?? 0}W <span class="stat-loss">${r?.losses ?? 0}L</span> <span class="stat-draw">${drawsCount}${drawChar}</span>`;
+    }
 
     const peakEl = $('stat-peak');
     if (peakEl) {
@@ -434,27 +440,17 @@
 
     const streakEl = $('stat-streak');
     if (streakEl) {
-      let currentStreak = 0; let streakType = null;
       const matchesToUse = liveStats ? liveStats.matches : DraftoutWidget.MOCK.matches;
-      if (matchesToUse?.length) {
-        for (const m of matchesToUse) {
-          const p = m.participants?.find(pt => pt.username?.toLowerCase() === uname.toLowerCase());
-          if (!p) continue;
-          const r = p.won ? 'win' : 'loss';
-          if (!streakType) { streakType = r; currentStreak = 1; }
-          else if (r === streakType) currentStreak++;
-          else break;
-        }
-      }
-      if (streakType === 'loss') {
-        streakEl.textContent = currentStreak + 'L';
+      const streak = DraftoutWidget.computeStreak(matchesToUse, uname);
+      if (streak.count === 0 || streak.type === 'none') {
+        streakEl.textContent = '0';
+        streakEl.style.color = '#94a3b8';
+      } else if (streak.type === 'loss') {
+        streakEl.textContent = streak.count + 'L';
         streakEl.style.color = '#ef4444';
-      } else if (streakType === 'win') {
-        streakEl.textContent = currentStreak + 'W';
+      } else if (streak.type === 'win') {
+        streakEl.textContent = streak.count + 'W';
         streakEl.style.color = '#f97316';
-      } else {
-        streakEl.textContent = isLive ? '0' : '12W';
-        streakEl.style.color = isLive ? '#94a3b8' : '#f97316';
       }
     }
 
